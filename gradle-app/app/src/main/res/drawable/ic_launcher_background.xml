@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 由图标生成器产出：样图选定的浅底（App 的 colorSurface）。     不放渐变与图案 —— 自适应图标的背景层会被各家启动器裁切缩放，纯色最稳。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#FFF6FAF9" />
+</shape>

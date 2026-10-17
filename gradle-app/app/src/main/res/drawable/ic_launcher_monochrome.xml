@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- C1「笔即电池」· 由图标生成器产出，改图形请改脚本后重跑 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+    <group android:scaleX="0.5" android:scaleY="0.5"
+        android:translateX="128.0" android:translateY="128.0">
+        <path android:pathData="M256 64c-31 0-56 25-56 56v188l56 140 56-140V120c0-31-25-56-56-56z" android:strokeColor="#FF000000"
+            android:strokeWidth="34" android:strokeLineJoin="round" android:strokeLineCap="round" />
+        <path android:pathData="M214 320h84l-42 104z" android:fillColor="#FF000000" />
+        <path android:pathData="M236 132h40a14 14 0 0 1 14 14v18a14 14 0 0 1 -14 14h-40a14 14 0 0 1 -14 -14v-18a14 14 0 0 1 14 -14z" android:fillColor="#FF000000" android:fillAlpha="0.28" />
+        <path android:pathData="M236 192h40a14 14 0 0 1 14 14v18a14 14 0 0 1 -14 14h-40a14 14 0 0 1 -14 -14v-18a14 14 0 0 1 14 -14z" android:fillColor="#FF000000" />
+        <path android:pathData="M236 252h40a14 14 0 0 1 14 14v18a14 14 0 0 1 -14 14h-40a14 14 0 0 1 -14 -14v-18a14 14 0 0 1 14 -14z" android:fillColor="#FF000000" />
+    </group>
+</vector>
