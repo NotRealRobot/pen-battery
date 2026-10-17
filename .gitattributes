@@ -1,0 +1,14 @@
+# gradlew 是 shell 脚本：被转成 CRLF 后在 Linux/macOS 上直接跑不动
+* text=auto
+*.java text eol=lf
+*.xml text eol=lf
+*.gradle text eol=lf
+*.properties text eol=lf
+*.md text eol=lf
+*.bat text eol=crlf
+gradlew text eol=lf
+*.jar binary
+*.png binary
+*.webp binary
+*.jks binary
+*.apk binary

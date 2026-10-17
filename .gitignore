@@ -1,0 +1,21 @@
+# 构建产物
+.gradle/
+build/
+*.apk
+*.aab
+
+# 本机私密：签名材料与本地配置，永不入库
+keystore.properties
+local.properties
+keystore/
+*.jks
+*.keystore
+
+# Python 字节码：它会把本机源码绝对路径烤进 .pyc，而文本扫描器又会跳过二进制 ⇒ 一律不入库
+__pycache__/
+*.py[cod]
+
+# IDE 与系统
+.idea/
+*.iml
+.DS_Store
