@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  顶层两个**平级**孩子：
+    ① BlurTarget id=contentRoot —— 要被模糊的内容根（BlurView 的取样源）
+    ② BlurView   id=navFrame   —— 悬浮胶囊，内部放 BottomNavigationView（不被糊）
+
+  ★ BlurTarget 不能包含指向它的 BlurView（官方规则），我们是兄弟节点，天然满足。
+  ★ 圆角 = 背景 drawable 的 28dp 圆角 + setClipToOutline(true)（官方推荐做法）。
+  ★ 蒙版 = app:blurOverlayColor（BlurView 在模糊图之上自己画）。
+  ★ 描边 = android:foreground 放一个只有描边的 shape（画在最上层，不受模糊影响）。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:fitsSystemWindows="true">
+
+    <eightbitlab.com.blurview.BlurTarget
+        android:id="@+id/contentRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 内容区直接顶到状态栏下方：顶部不再放应用栏，页面归属由底部悬浮导航表达 -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </eightbitlab.com.blurview.BlurTarget>
+
+
+    <!-- 悬浮底栏：宽度写死 @dimen/nav_width（match_constraint+max 实测不生效，会量成 505dp 宽板）
+         ★ 不要 elevation：投影会在胶囊四周糊一圈灰，玻璃观感立刻变成"灰色底板"。
+         ★ 不要 background 也放描边：BlurView 的 draw() 先画模糊图、再 super.draw() 画自己的
+           background/foreground ⇒ 描边会被画两遍（≈24% 黑），同样把玻璃框成实心板。
+           圆角由 MainActivity 里的 OutlineProvider + clipToOutline 负责。 -->
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/navFrame"
+        android:layout_width="@dimen/nav_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:foreground="@drawable/bg_nav_border"
+        app:blurOverlayColor="@color/nav_glass_scrim">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/nav" />
+    </eightbitlab.com.blurview.BlurView>
+</FrameLayout>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  默认语言 = 英文（AOSP 惯例：无限定符的资源是"其他语言"的兜底）。
+  中文在 ../values-zh/strings.xml，两边键名必须一一对应 —— 缺一个键，中文界面就会掉回英文。
+  文案规矩：遮罩/提示一律"现状 + 下一步"，不写 error/failed 这类词；遮罩标签保持短。
+-->
+<resources>
+    <string name="app_name">Pen Battery</string>
+
+    <string name="nav_battery">Battery</string>
+    <string name="nav_history">History</string>
+    <string name="nav_about">About</string>
+
+    <string name="pen_name">Dell PN7522W</string>
+    <string name="pen_connected">Dell PN7522W · Connected</string>
+    <string name="pen_disconnected">Dell PN7522W · Not connected</string>
+
+    <string name="section_status">Status</string>
+    <string name="section_overview">Overview</string>
+    <string name="section_detail">Details</string>
+    <string name="section_app">App</string>
+    <string name="section_device">Device</string>
+    <string name="section_source">Data source</string>
+    <string name="section_notes">Notes</string>
+
+    <string name="chip_level">Level</string>
+
+    <string name="today_reads">Reads today</string>
+    <string name="recorded_days">Days recorded</string>
+    <string name="no_record">No record</string>
+
+    <string name="btn_export">Export…</string>
+    <string name="btn_clear">Clear history</string>
+    <string name="btn_copy_diag">Copy diagnostics</string>
+
+    <string name="col_date">Date</string>
+    <string name="col_level">Level</string>
+    <string name="col_last">Last</string>
+    <string name="col_count">Reads</string>
+
+    <string name="spec_version">Version</string>
+    <string name="spec_installed">Installed</string>
+    <string name="spec_device">Device name</string>
+    <string name="spec_mac">Bluetooth address</string>
+    <string name="spec_chip">Chip</string>
+    <string name="spec_service">Battery service</string>
+    <string name="spec_char">Level characteristic</string>
+    <string name="spec_first">First record</string>
+    <string name="spec_total">Days recorded</string>
+
+    <string name="note_why">Why the system doesn\'t show it</string>
+    <string name="note_why_body">The pad\'s Bluetooth stack never subscribes to this pen\'s
+        Battery Level characteristic, so the system UI shows no pen battery.
+        This app subscribes over GATT itself.</string>
+    <string name="note_accuracy">Reading accuracy</string>
+    <string name="note_accuracy_body">The pen firmware reports 0–100; the app reads it as-is.</string>
+
+    <string name="overview_summary">%2$d of the last %1$d days have records</string>
+    <string name="overview_sampling_note">The curve samples only while the app is open — a gap is a real no-data period</string>
+    <string name="runtime_none">No round yet</string>
+    <string name="runtime_hint_none">Timing starts after a 100% reading</string>
+    <string name="runtime_done">Round duration</string>
+    <string name="runtime_running">Running for</string>
+    <string name="runtime_hint_done">%1$s → %2$s · reached low battery</string>
+    <string name="runtime_hint_running">Started %1$s · low battery not reached</string>
+
+    <string name="dlg_clear_title">Delete all records?</string>
+    <string name="dlg_clear_body">This removes every stored battery record and can\'t be undone.</string>
+    <string name="dlg_clear_ok">Delete</string>
+    <string name="dlg_cancel">Cancel</string>
+
+    <string name="msg_copied">Diagnostics copied to clipboard</string>
+    <string name="msg_need_perm">Bluetooth permission is required to read the battery</string>
+    <string name="status_idle">Not started</string>
+    <string name="status_not_connected">Not connected</string>
+    <string name="status_sleeping">Not connected · make sure the pen is in use</string>
+    <string name="status_no_target">No device · tap to choose</string>
+    <string name="status_unsupported">Device not supported</string>
+    <string name="need_bt_first">Turn on Bluetooth before choosing a device</string>
+    <string name="status_no_bonded">No paired Bluetooth devices · pair one in Settings first</string>
+    <string name="action_pick">Choose device</string>
+    <string name="action_switch_target">Switch device</string>
+    <string name="dlg_pick_title">Choose the device to read</string>
+
+    <!-- 遮罩文案：短、说现状；可点的那几个字单独给 -->
+    <string name="disabled_level">Not supported</string>
+    <string name="mask_no_target">No device</string>
+    <string name="link_bt_on">Turn on Bluetooth</string>
+    <string name="link_switch_device">Choose a device</string>
+    <string name="status_bt_off">Turn on Bluetooth</string>
+    <string name="disabled_stats">Readings paused</string>
+    <string name="disabled_trend">Recording stopped</string>
+    <string name="disabled_detail">History frozen</string>
+    <string name="disabled_source">Not verified</string>
+    <string name="last_update">Updated</string>
+
+    <string name="foot_source">Source: BLE Battery service 0x180F (0x2A19 Level)</string>
+
+    <!-- 原先硬编码在 Java 里的界面文案（不搬进来就会中英混杂） -->
+    <string name="not_selected">Not set</string>
+    <string name="none_yet">None</string>
+    <string name="version_unavailable">Unavailable</string>
+    <string name="count_times">%1$d reads</string>
+    <string name="count_days">%1$d days</string>
+    <string name="dur_dhm">%1$dd %2$dh %3$dm</string>
+    <string name="dur_hm">%1$dh %2$dm</string>
+    <string name="dur_m">%1$d min</string>
+    <string name="current_suffix"> (current)</string>
+    <string name="diag_header">=== Pen Battery diagnostics ===</string>
+    <string name="export_ok">Exported to: %1$s</string>
+    <string name="export_fail_write">Couldn\'t write to the chosen location</string>
+    <string name="export_fail_err">Export failed: %1$s</string>
+    <string name="csv_header">Date,Battery %,Last reading,Reads</string>
+
+    <string name="gatt_no_adapter">No Bluetooth adapter on this device</string>
+    <string name="gatt_bt_off">Bluetooth is off</string>
+    <string name="gatt_no_perm">Bluetooth permission missing</string>
+    <string name="gatt_bad_addr">Invalid device address</string>
+    <string name="gatt_connecting">Connecting…</string>
+    <string name="gatt_stopped">Stopped</string>
+    <string name="gatt_discovering">Connected, discovering services…</string>
+    <string name="gatt_disconnected">Disconnected (status=%1$d)</string>
+    <string name="gatt_no_service">Battery service 0x180F not found</string>
+    <string name="gatt_no_char">Battery Level characteristic 0x2A19 not found</string>
+    <string name="gatt_subscribing">Subscribing…</string>
+    <string name="gatt_ready">Ready</string>
+
+    <string name="src_read">read</string>
+    <string name="src_notify">notify</string>
+    <string name="src_pull">pull-to-refresh</string>
+    <string name="src_poll">periodic poll</string>
+    <string name="src_cccd_timeout">CCCD timeout</string>
+    <string name="src_no_cccd">no CCCD</string>
+    <string name="src_sub_done">subscribed</string>
+    <string name="src_step_guard">step guard</string>
+
+    <!-- 设置 / 语言 -->
+    <string name="action_settings">Settings</string>
+    <string name="dlg_lang_title">Language</string>
+    <string name="lang_system_of">System default (%1$s)</string>
+    <string name="lang_en">English</string>
+    <string name="lang_zh">简体中文</string>
+    <!-- 星期短名：索引 0=周一 … 6=周日（不用 java.time 的 TextStyle，设备 CLD 给什么不可控） -->
+    <string-array name="weekdays_short">
+        <item>Mon</item><item>Tue</item><item>Wed</item><item>Thu</item><item>Fri</item><item>Sat</item><item>Sun</item>
+    </string-array>
+</resources>

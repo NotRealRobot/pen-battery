@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 底栏「电量」图标：横向电池（空心壳 + 内部电量填充 + 正极凸起）
+     外壳用 evenOdd 挖出内腔，再叠加填充块 ⇒ 一眼可辨的"电量" -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M4.5,7 H16 A2.5,2.5 0 0 1 18.5,9.5 V14.5 A2.5,2.5 0 0 1 16,17 H4.5 A2.5,2.5 0 0 1 2,14.5 V9.5 A2.5,2.5 0 0 1 4.5,7 Z M4.8,9.3 H15.2 A0.8,0.8 0 0 1 16,10.1 V13.9 A0.8,0.8 0 0 1 15.2,14.7 H4.8 A0.8,0.8 0 0 1 4,13.9 V10.1 A0.8,0.8 0 0 1 4.8,9.3 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4.8,9.3 H10.4 A0.8,0.8 0 0 1 11.2,10.1 V13.9 A0.8,0.8 0 0 1 10.4,14.7 H4.8 A0.8,0.8 0 0 1 4,13.9 V10.1 A0.8,0.8 0 0 1 4.8,9.3 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M18.6,10.2 H20.6 A1.2,1.2 0 0 1 21.8,11.4 V12.6 A1.2,1.2 0 0 1 20.6,13.8 H18.6 Z" />
+</vector>

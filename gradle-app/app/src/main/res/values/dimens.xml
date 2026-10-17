@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      悬浮底栏的**固定宽度**（不再用 match_constraint + max：那条路实测不生效，
+      16:35 的实测日志量到 1137px = 505dp，而上限写的是 420dp ⇒ ConstraintLayout 没执行）。
+      竖屏屏宽 = 1600px / 2.25 = 711dp，320dp ≈ 45%；横屏 ≈ 28%。
+      3 个 item × itemMinWidth 96dp = 288dp，塞得下且留有余量。
+    -->
+    <dimen name="nav_width">320dp</dimen>
+</resources>

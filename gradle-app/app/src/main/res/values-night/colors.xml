@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MD3 品牌色板（深色）· 方案 C「青柠绿」。与 values/colors.xml 同名，DayNight 自动挑选。 -->
+<resources>
+    <color name="md_theme_primary">#FFA8E63A</color>
+    <color name="md_theme_onPrimary">#FF1B3300</color>
+    <color name="md_theme_primaryContainer">#FF335100</color>
+    <color name="md_theme_onPrimaryContainer">#FFCBF768</color>
+
+    <color name="md_theme_secondary">#FFC3C99B</color>
+    <color name="md_theme_onSecondary">#FF2B2F1B</color>
+    <color name="md_theme_secondaryContainer">#FF414629</color>
+    <color name="md_theme_onSecondaryContainer">#FFDFE5B6</color>
+
+    <color name="md_theme_tertiary">#FF7AD9DC</color>
+    <color name="md_theme_onTertiary">#FF003739</color>
+    <color name="md_theme_tertiaryContainer">#FF004F52</color>
+    <color name="md_theme_onTertiaryContainer">#FF9CF1F3</color>
+
+    <color name="md_theme_error">#FFFFB4AB</color>
+    <color name="md_theme_onError">#FF690005</color>
+    <color name="md_theme_errorContainer">#FF93000A</color>
+    <color name="md_theme_onErrorContainer">#FFFFDAD6</color>
+
+    <color name="nav_floating_bg">#CC1E2418</color>
+
+    <!-- 毛玻璃蒙版（深色）：alpha 5%，与浅色侧同样走"薄蒙版" -->
+    <color name="nav_glass_scrim">#0D14180F</color>
+
+    <!-- 胶囊描边（深色） -->
+    <color name="nav_glass_border">#2BFFFFFF</color>
+
+    <!-- 电量渐变（深色）：同样 5 档，整体提亮保证压在深色底板上仍看得出层次 -->
+    <color name="battery_crit">#FFFFB4AB</color>
+    <color name="battery_low">#FFE8A98F</color>
+    <color name="battery_fair">#FFD8BE86</color>
+    <color name="battery_ok">#FFB9C08E</color>
+    <color name="battery_full">#FFC3C99B</color>
+
+    <color name="refresh_scrim">#52000000</color>
+
+    <!-- 卡片涟漪：低透明度白色（用户要求保留面板涟漪） -->
+    <color name="card_ripple">#1FFFFFFF</color>
+</resources>

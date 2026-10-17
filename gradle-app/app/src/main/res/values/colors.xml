@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MD3 品牌色板 · 方案 C「青柠绿」（用户选定）。
+  ★ 只定义 primary / secondary / tertiary / error 四组品牌色；
+    中性色（surface / onSurface / outline / surfaceContainer …）用 Theme.Material3 默认实现，
+    这样深浅层级与官方一致，不会被我改乱（否则 surface 与 surfaceContainer 的层级会错）。
+-->
+<resources>
+    <!-- primary：草绿 -->
+    <color name="md_theme_primary">#FF3E7D00</color>
+    <color name="md_theme_onPrimary">#FFFFFFFF</color>
+    <color name="md_theme_primaryContainer">#FFB4F53C</color>
+    <color name="md_theme_onPrimaryContainer">#FF0F2000</color>
+
+    <!-- secondary：橄榄绿 -->
+    <color name="md_theme_secondary">#FF5C6040</color>
+    <color name="md_theme_onSecondary">#FFFFFFFF</color>
+    <color name="md_theme_secondaryContainer">#FFE0E5C0</color>
+    <color name="md_theme_onSecondaryContainer">#FF191D05</color>
+
+    <!-- tertiary：青（与图标/笔的青色呼应） -->
+    <color name="md_theme_tertiary">#FF00696B</color>
+    <color name="md_theme_onTertiary">#FFFFFFFF</color>
+    <color name="md_theme_tertiaryContainer">#FF8CF3F1</color>
+    <color name="md_theme_onTertiaryContainer">#FF001F1F</color>
+
+    <!-- error：M3 标准红 -->
+    <color name="md_theme_error">#FFBA1A1A</color>
+    <color name="md_theme_onError">#FFFFFFFF</color>
+    <color name="md_theme_errorContainer">#FFFFDAD6</color>
+    <color name="md_theme_onErrorContainer">#FF410002</color>
+
+    <!-- 悬浮底栏：半透明（首次绘制 / 模糊兜底时用；83% ⇒ 仍能透出一点内容） -->
+    <color name="nav_floating_bg">#CCF4F8E8</color>
+
+    <!-- 毛玻璃蒙版：盖在模糊底图之上，alpha 越低越通透。
+         6% ⇒ 几乎只剩"提亮一层"，通透度交给模糊本身去做。 -->
+    <color name="nav_glass_scrim">#0FF6FBE9</color>
+
+    <!-- 胶囊描边：底色是纯色时靠它勾出轮廓（毛玻璃观感的关键） -->
+    <color name="nav_glass_border">#21000000</color>
+
+    <!-- 电量渐变（底板用）：5 档标定，按 0/15/35/60/100 分段线性插值。
+         设计意图：高电量走**低饱和橄榄绿**（不抢 primary 的鲜艳草绿），
+         只有真的接近见底才逐步走向鲜艳的红 —— 警示色要"晚到"才有效。 -->
+    <color name="battery_crit">#FFBA1A1A</color>
+    <color name="battery_low">#FFA8552F</color>
+    <color name="battery_fair">#FF8F7A2E</color>
+    <color name="battery_ok">#FF6F7A3E</color>
+    <color name="battery_full">#FF5C6040</color>
+
+    <!-- 下拉刷新时的页面蒙版（MD3 对话框同款 32% 黑） -->
+    <color name="refresh_scrim">#52000000</color>
+
+    <!-- 卡片涟漪：低透明度墨色（用户要求：无可点按键的面板也要有涟漪，减弱变色但保留动画） -->
+    <color name="card_ripple">#1A000000</color>
+</resources>

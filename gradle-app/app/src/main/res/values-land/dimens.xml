@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 横屏屏宽 = 2560px / 2.25 = 1138dp，360dp ≈ 32% —— 仍然只是一小块 -->
+    <dimen name="nav_width">360dp</dimen>
+</resources>

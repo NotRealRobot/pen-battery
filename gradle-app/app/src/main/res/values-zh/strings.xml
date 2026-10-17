@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 中文。键名必须与 ../values/strings.xml（英文默认）一一对应。 -->
+<resources>
+    <string name="app_name">Pen Battery</string>
+
+    <string name="nav_battery">电量</string>
+    <string name="nav_history">记录</string>
+    <string name="nav_about">关于</string>
+
+    <string name="pen_name">Dell PN7522W</string>
+    <string name="pen_connected">Dell PN7522W · 已连接</string>
+    <string name="pen_disconnected">Dell PN7522W · 未连接</string>
+
+    <string name="section_status">状态</string>
+    <string name="section_overview">概览</string>
+    <string name="section_detail">明细</string>
+    <string name="section_app">应用</string>
+    <string name="section_device">设备</string>
+    <string name="section_source">数据来源</string>
+    <string name="section_notes">说明</string>
+
+    <string name="chip_level">电量</string>
+
+    <string name="today_reads">今日读取次数</string>
+    <string name="recorded_days">记录天数</string>
+    <string name="no_record">无记录</string>
+
+    <string name="btn_export">导出到…</string>
+    <string name="btn_clear">清空记录</string>
+    <string name="btn_copy_diag">复制诊断信息</string>
+
+    <string name="col_date">日期</string>
+    <string name="col_level">电量</string>
+    <string name="col_last">最后一次</string>
+    <string name="col_count">次数</string>
+
+    <string name="spec_version">版本</string>
+    <string name="spec_installed">安装时间</string>
+    <string name="spec_device">设备名称</string>
+    <string name="spec_mac">蓝牙地址</string>
+    <string name="spec_chip">芯片厂商</string>
+    <string name="spec_service">电池服务</string>
+    <string name="spec_char">电量特征</string>
+    <string name="spec_first">首条记录</string>
+    <string name="spec_total">累计记录</string>
+
+    <string name="note_why">系统电量显示</string>
+    <string name="note_why_body">平板蓝牙栈不订阅该笔的 Battery Level 特征，故系统界面不显示笔电量。
+        本应用经 GATT 订阅补齐该链路。</string>
+    <string name="note_accuracy">数值精度</string>
+    <string name="note_accuracy_body">电量由笔固件上报（0–100），应用原样读取。</string>
+
+    <string name="overview_summary">最近 %1$d 天有记录 %2$d 天</string>
+    <string name="overview_sampling_note">曲线只在应用打开时采样，断口即真实的无数据时段</string>
+    <string name="runtime_none">尚无本轮数据</string>
+    <string name="runtime_hint_none">读到一次 100% 后开始计时</string>
+    <string name="runtime_done">本轮运行时长</string>
+    <string name="runtime_running">本轮已运行</string>
+    <string name="runtime_hint_done">%1$s → %2$s · 已进入低电量</string>
+    <string name="runtime_hint_running">起点 %1$s · 尚未进入低电量</string>
+
+    <string name="dlg_clear_title">清空全部记录？</string>
+    <string name="dlg_clear_body">将删除所有历史电量记录，且不可恢复。</string>
+    <string name="dlg_clear_ok">清空</string>
+    <string name="dlg_cancel">取消</string>
+
+    <string name="msg_copied">诊断信息已复制到剪贴板</string>
+    <string name="msg_need_perm">需要蓝牙权限才能读取电量</string>
+    <string name="status_idle">尚未开始</string>
+    <string name="status_not_connected">未连接</string>
+    <string name="status_sleeping">未连接 · 请确认触控笔在使用中</string>
+    <string name="status_no_target">未连接到设备 · 点击选择</string>
+    <string name="status_unsupported">设备不适配</string>
+    <string name="need_bt_first">请先打开蓝牙再选择设备</string>
+    <string name="status_no_bonded">系统里没有已配对的蓝牙设备 · 请先在设置里配对</string>
+    <string name="action_pick">选择设备</string>
+    <string name="action_switch_target">切换连接设备</string>
+    <string name="dlg_pick_title">选择要读取电量的设备</string>
+
+    <string name="disabled_level">设备不适配</string>
+    <string name="mask_no_target">未连接到设备</string>
+    <string name="link_bt_on">点我打开蓝牙</string>
+    <string name="link_switch_device">点我切换连接设备</string>
+    <string name="status_bt_off">请打开蓝牙</string>
+    <string name="disabled_stats">读数已冻结</string>
+    <string name="disabled_trend">已停止记录</string>
+    <string name="disabled_detail">明细已冻结</string>
+    <string name="disabled_source">此设备未验证</string>
+    <string name="last_update">最后更新</string>
+
+    <string name="foot_source">数据来源：BLE 电池服务 0x180F（0x2A19 电量）</string>
+
+    <string name="not_selected">未选择</string>
+    <string name="none_yet">暂无</string>
+    <string name="version_unavailable">版本信息不可用</string>
+    <string name="count_times">%1$d 次</string>
+    <string name="count_days">%1$d 天</string>
+    <string name="dur_dhm">%1$d 天 %2$d 小时 %3$d 分</string>
+    <string name="dur_hm">%1$d 小时 %2$d 分</string>
+    <string name="dur_m">%1$d 分</string>
+    <string name="current_suffix">（当前）</string>
+    <string name="diag_header">=== Pen Battery 诊断信息 ===</string>
+    <string name="export_ok">已导出到：%1$s</string>
+    <string name="export_fail_write">导出失败：无法写入所选位置</string>
+    <string name="export_fail_err">导出失败：%1$s</string>
+    <string name="csv_header">日期,电量%,当天最后一次读数时间,当天读数次数</string>
+
+    <string name="gatt_no_adapter">本机没有蓝牙适配器</string>
+    <string name="gatt_bt_off">蓝牙未开启</string>
+    <string name="gatt_no_perm">缺少蓝牙权限</string>
+    <string name="gatt_bad_addr">设备地址无效</string>
+    <string name="gatt_connecting">正在连接…</string>
+    <string name="gatt_stopped">已停止</string>
+    <string name="gatt_discovering">已连接，正在发现服务…</string>
+    <string name="gatt_disconnected">连接断开（status=%1$d）</string>
+    <string name="gatt_no_service">没找到电池服务 0x180F</string>
+    <string name="gatt_no_char">没有电量特征 0x2A19</string>
+    <string name="gatt_subscribing">正在建立订阅…</string>
+    <string name="gatt_ready">就绪</string>
+
+    <string name="src_read">读取</string>
+    <string name="src_notify">通知</string>
+    <string name="src_pull">手动下拉刷新</string>
+    <string name="src_poll">定时兜底</string>
+    <string name="src_cccd_timeout">CCCD 超时兜底</string>
+    <string name="src_no_cccd">无 CCCD</string>
+    <string name="src_sub_done">订阅完成</string>
+    <string name="src_step_guard">步进异常兜底</string>
+
+    <string name="action_settings">设置</string>
+    <string name="dlg_lang_title">语言</string>
+    <string name="lang_system_of">跟随系统（%1$s）</string>
+    <string name="lang_en">English</string>
+    <string name="lang_zh">简体中文</string>
+    <string-array name="weekdays_short">
+        <item>周一</item><item>周二</item><item>周三</item><item>周四</item><item>周五</item><item>周六</item><item>周日</item>
+    </string-array>
+</resources>
