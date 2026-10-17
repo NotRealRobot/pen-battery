@@ -1,0 +1,66 @@
+plugins {
+    id 'com.android.application'
+}
+
+// 签名信息只从 gradle-app/keystore.properties 读（已 gitignore，永不入库）。
+// 克隆后如需签名：复制 keystore.properties.example 为 keystore.properties 再填。
+// 没有这个文件照样能编译，只是 release 不签名（debug 走 AGP 默认的 debug keystore）。
+// 设备目标地址与签名无关：运行时由 PenTarget 解析，不存在编译期注入。
+def localCfgFile = rootProject.file('keystore.properties')
+def localCfg = new Properties()
+if (localCfgFile.exists()) localCfgFile.withInputStream { localCfg.load(it) }
+def cfg = { String k -> localCfg.getProperty(k) ?: '' }
+def signed = localCfgFile.exists() && cfg('store.file') != ''
+def storeFileOf = { String p -> def f = new File(p); f.isAbsolute() ? f : rootProject.file(p) }
+if (signed && !storeFileOf(cfg('store.file')).exists()) {
+    throw new GradleException("store.file 指向的文件不存在：${storeFileOf(cfg('store.file'))}")
+}
+
+android {
+    namespace 'com.playbuddy.penbattery'
+    compileSdk 37
+
+    defaultConfig {
+        applicationId 'com.playbuddy.penbattery'
+        minSdk 33
+        targetSdk 33
+        versionCode 67
+        versionName '2.7.2'
+    }
+
+    signingConfigs {
+        release {
+            if (signed) {
+                storeFile storeFileOf(cfg('store.file'))
+                storePassword cfg('store.password')
+                keyAlias cfg('key.alias')
+                keyPassword cfg('key.password')
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            if (signed) signingConfig signingConfigs.release
+        }
+        release {
+            minifyEnabled false
+            if (signed) signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // Material 一行会带进 appcompat / fragment / recyclerview 等几十个传递依赖 ——
+    // 这正是必须用 Gradle 的理由：旧的手写构建链没有依赖解析能力。
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'   // 官方下拉刷新
+    implementation 'com.github.Dimezis:BlurView:version-3.2.0'               // 毛玻璃（jitpack）
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'                // 记录页趋势图（jitpack）
+}
