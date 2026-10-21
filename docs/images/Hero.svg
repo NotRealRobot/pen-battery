@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="914" viewBox="0 0 1600 914" role="img" 
+aria-label="Pen Battery app icon on a lime glow background">
+<defs><radialGradient id="glow" cx="50%" cy="50%" r="40.00%">
+<stop offset="0" stop-color="#B4F53C" stop-opacity="0.55"/>
+<stop offset="1" stop-color="#B4F53C" stop-opacity="0"/>
+</radialGradient></defs>
+<rect width="1600" height="914" fill="#F6FAF9"/>
+<rect width="1600" height="914" fill="url(#glow)"/>
+<rect x="490.0" y="147.0" width="620" height="620" rx="139.5" fill="none" stroke="#3E7D00" stroke-opacity="0.12" stroke-width="2"/>
+<g transform="translate(490.0 147.0) scale(1.2109) translate(128.0 128.0) scale(0.50)" fill="none">
+  <path stroke="#3E7D00" stroke-width="34" stroke-linejoin="round" stroke-linecap="round" d="M256 64c-31 0-56 25-56 56v188l56 140 56-140V120c0-31-25-56-56-56z"/>
+  <path fill="#3E7D00" d="M214 320h84l-42 104z"/>
+  <path fill="#3E7D00" fill-opacity="0.28" d="M236 132h40a14 14 0 0 1 14 14v18a14 14 0 0 1 -14 14h-40a14 14 0 0 1 -14 -14v-18a14 14 0 0 1 14 -14z"/>
+  <path fill="#3E7D00" d="M236 192h40a14 14 0 0 1 14 14v18a14 14 0 0 1 -14 14h-40a14 14 0 0 1 -14 -14v-18a14 14 0 0 1 14 -14z"/>
+  <path fill="#3E7D00" d="M236 252h40a14 14 0 0 1 14 14v18a14 14 0 0 1 -14 14h-40a14 14 0 0 1 -14 -14v-18a14 14 0 0 1 14 -14z"/>
+</g></svg>

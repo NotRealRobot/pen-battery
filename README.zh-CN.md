@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/Hero.png" width="100%" alt="Pen Battery —— 一支画成电量格的触控笔">
+<img src="docs/images/Hero.svg" width="100%" alt="Pen Battery —— 一支画成电量格的触控笔">
 
 # 🔋 Pen Battery
 
