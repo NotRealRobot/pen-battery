@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="docs/images/Hero.svg" width="100%" alt="Pen Battery — a stylus drawn as a battery gauge">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/Hero-dark.svg">
+  <img src="docs/images/Hero.svg" width="100%" alt="Pen Battery — a stylus drawn as a battery gauge">
+</picture>
 
 # 🔋 Pen Battery
 
