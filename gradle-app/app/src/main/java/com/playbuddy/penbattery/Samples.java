@@ -33,6 +33,14 @@ public final class Samples {
         public boolean complete() { return startTs > 0 && endTs > 0; }
     }
 
+    /** 一个已封存（走完）的周期：idx 是它在库里的序号，也就是界面上的「第 n 周期」。 */
+    public static final class Sealed {
+        public final int idx;
+        public final long startTs;
+        public final long endTs;
+        Sealed(int idx, long startTs, long endTs) { this.idx = idx; this.startTs = startTs; this.endTs = endTs; }
+    }
+
     private static final int FULL_PCT = 100;
     private static final int LOW_PCT = 10;
     /** 同一个值在这么短的时间内不重复入库（60 s 轮询 ⇒ 满电挂着不动时会刷屏） */
@@ -41,14 +49,31 @@ public final class Samples {
     private static final int MAX_POINTS = 20_000;
 
     private static final class Db extends SQLiteOpenHelper {
-        Db(Context c) { super(c, "pen_battery_samples.db", null, 1); }
+        Db(Context c) { super(c, "pen_battery_samples.db", null, 2); }
         @Override public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE samples (ts INTEGER PRIMARY KEY, pct INTEGER NOT NULL)");
+            createCycles(db);
         }
-        @Override public void onUpgrade(SQLiteDatabase db, int a, int b) {
-            db.execSQL("DROP TABLE IF EXISTS samples");
-            onCreate(db);
+        /**
+         * v1 → v2 只加 cycles 表。**不能沿用旧的 DROP + onCreate**：那会把用户跑出来的
+         * 时间序列整表清掉，而周期封存的起点恰恰只存在于这份序列里。
+         */
+        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion < 2) createCycles(db);
         }
+    }
+
+    /**
+     * 封存的周期表。为什么要落库而不每次从 samples 现推：
+     *   ① samples 按条数截断（MAX_POINTS），老周期的端点会消失，「第 n 周期」就不能再靠现推得到；
+     *   ② 序号要稳定 —— 现推的话最早一轮一旦掉出窗口，后面每一轮的编号都会往前挪。
+     * start_ts 唯一 ⇒ 回填可以反复跑而不会插重复。
+     */
+    private static void createCycles(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS cycles ("
+                + "idx INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "start_ts INTEGER UNIQUE NOT NULL, "
+                + "end_ts INTEGER NOT NULL)");
     }
 
     private static Db db(Context c) { return new Db(c.getApplicationContext()); }
@@ -69,7 +94,12 @@ public final class Samples {
             cv.put("pct", pct);
             w.insert("samples", null, cv);
 
-            // 截断过老的数据（按条数，不按时间：前台采样密度不均）
+            // 读到 ≤10% ⇒ 这一轮已经在终点上：当场归档，别等下次打开记录页。
+            // 拖到那时再算，终点还可能被按天表当天的"充回 100%"顶掉（用户 10-26 的实际数据就是这种日子）。
+            if (pct <= LOW_PCT) sealInto(c, w);
+
+            // 截断过老的数据（按条数，不按时间：前台采样密度不均）。放在归档之后：
+            // 刚走完那轮的起点可能就是最老的那批点，先封存掉才敢删。
             w.execSQL("DELETE FROM samples WHERE ts < "
                     + "(SELECT MIN(ts) FROM (SELECT ts FROM samples ORDER BY ts DESC LIMIT ?))",
                     new Object[]{MAX_POINTS});
@@ -104,6 +134,89 @@ public final class Samples {
         return new Cycle(start, end);
     }
 
+    /**
+     * 把时间序列里已经走完的周期回填进 cycles 表（幂等，可每次进页面都跑）。
+     * 判定口径与 {@link #cycle} 完全一致：读到 100% 开新一轮，其后第一次 ≤10% 收尾。
+     *
+     * 起点补法：序列里没看见 100% 时（本表 2.6.0 才建，更早那一轮的满电只存在按天表里），
+     * 退到 {@link History#lastFullBefore} 取终点之前最近的一次满电日。两处都没有，就不封 ——
+     * 宁可这一轮先不收起来，也不编一个没观测到的起点。
+     */
+    public static int sealCompleted(Context c) {
+        try (Db d = db(c); SQLiteDatabase w = d.getWritableDatabase()) {
+            return sealInto(c, w);
+        }
+    }
+
+    private static int sealInto(Context c, SQLiteDatabase w) {
+        int added = 0;
+        long start = -1;
+        // 已经封到哪（含以前几次运行封的）：补出来的起点必须晚于它，
+        // 否则低电量持续那几天会拿一个更老的满电日反复去凑"新周期"
+        long lastEnd = -1;
+        try (Cursor cur = w.rawQuery("SELECT MAX(end_ts) FROM cycles", null)) {
+            if (cur.moveToFirst() && !cur.isNull(0)) lastEnd = cur.getLong(0);
+        }
+        try (Cursor cur = w.rawQuery("SELECT ts, pct FROM samples ORDER BY ts ASC", null)) {
+            while (cur.moveToNext()) {
+                long ts = cur.getLong(0);
+                int pct = cur.getInt(1);
+                if (pct >= FULL_PCT) { start = ts; }                       // 新的满电 ⇒ 开新一轮
+                else if (pct <= LOW_PCT) {
+                    long s = start > 0 ? start : History.lastFullBefore(c, ts);
+                    if (s <= 0) {
+                        android.util.Log.i("Samples", "低电量 " + pct + "% 在 " + ts
+                                + " 找不到起点：序列与按天表里都没有更早的满电");
+                    } else if (start > 0 || s > lastEnd) {
+                        ContentValues cv = new ContentValues();
+                        cv.put("start_ts", s);
+                        cv.put("end_ts", ts);
+                        // start_ts 唯一 ⇒ 同一个起点只会封一次；夹在中间的重复低电量读数不会插第二条
+                        if (w.insertWithOnConflict("cycles", null, cv, SQLiteDatabase.CONFLICT_IGNORE) > 0) {
+                            added++;
+                            lastEnd = ts;
+                            // 留一行证据：装机后若明细里仍没有分组，先看这条日志有没有打出来
+                            android.util.Log.i("Samples", "封存周期 " + s + " → " + ts
+                                    + (start > 0 ? "（起点来自序列）" : "（起点来自按天表）"));
+                        }
+                    }
+                    start = -1;
+                }
+            }
+        }
+        return added;
+    }
+
+    /** 已封存的周期，按序号升序 */
+    public static List<Sealed> sealed(Context c) {
+        List<Sealed> out = new ArrayList<>();
+        try (Db d = db(c); SQLiteDatabase r = d.getReadableDatabase();
+             Cursor cur = r.rawQuery("SELECT idx, start_ts, end_ts FROM cycles ORDER BY idx ASC", null)) {
+            while (cur.moveToNext()) out.add(new Sealed(cur.getInt(0), cur.getLong(1), cur.getLong(2)));
+        }
+        return out;
+    }
+
+    /** 某时间窗内最后一个点；没有则 null。用于「一天跨两轮」时把那两轮各自当天的收尾值分开 */
+    public static Point lastBetween(Context c, long from, long to) {
+        try (Db d = db(c); SQLiteDatabase r = d.getReadableDatabase();
+             Cursor cur = r.rawQuery("SELECT ts, pct FROM samples WHERE ts >= ? AND ts <= ? "
+                     + "ORDER BY ts DESC LIMIT 1", new String[]{String.valueOf(from), String.valueOf(to)})) {
+            if (cur.moveToFirst()) return new Point(cur.getLong(0), cur.getInt(1));
+        }
+        return null;
+    }
+
+    /** 某时间窗内的读数次数 */
+    public static int countBetween(Context c, long from, long to) {
+        try (Db d = db(c); SQLiteDatabase r = d.getReadableDatabase();
+             Cursor cur = r.rawQuery("SELECT COUNT(*) FROM samples WHERE ts >= ? AND ts <= ?",
+                     new String[]{String.valueOf(from), String.valueOf(to)})) {
+            if (cur.moveToFirst()) return cur.getInt(0);
+        }
+        return 0;
+    }
+
     public static int count(Context c) {
         try (Db d = db(c); SQLiteDatabase r = d.getReadableDatabase();
              Cursor cur = r.rawQuery("SELECT COUNT(*) FROM samples", null)) {
@@ -114,6 +227,8 @@ public final class Samples {
     public static void clear(Context c) {
         try (Db d = db(c); SQLiteDatabase w = d.getWritableDatabase()) {
             w.delete("samples", null, null);
+            // 封存的周期也得一起清：只清 samples 的话「清空」后明细里还留着一串空壳分组标题
+            w.delete("cycles", null, null);
         }
     }
 

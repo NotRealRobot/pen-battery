@@ -109,6 +109,21 @@ public class History {
         return best;
     }
 
+    /**
+     * 严格早于 beforeMs 的最近一次「那天最后一次读数就是满电」的时刻；没有则 -1。
+     * 时间序列 2.6.0 才建，更早那一轮的起点只存在这里 ⇒ 封存老周期时用它补起点。
+     */
+    public static long lastFullBefore(Context c, long beforeMs) {
+        long best = -1;
+        for (String d : allDates(c)) {
+            Day day = get(c, d);
+            if (day == null || day.pct < 100) continue;
+            long ms = day.tsMillis();
+            if (ms > 0 && ms < beforeMs && ms > best) best = ms;
+        }
+        return best;
+    }
+
     /** 全部有记录的日期，按时间升序 */
     public static java.util.List<String> allDates(Context c) {
         java.util.List<String> out = new java.util.ArrayList<>();
