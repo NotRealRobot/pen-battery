@@ -56,7 +56,7 @@ directly over GATT and records the readings locally.
 ## ⬇️ Installation
 
 Install the prebuilt package from this repository's **Releases** page: the asset `app-release.apk`
-attached to the newest tag (currently `v2.7.2`, versionCode 67). It is signed with the project's
+attached to the newest tag (currently `v2.7.7`, versionCode 72). It is signed with the project's
 release key — signing certificate SHA-1 `4374fe36ebc1326bc9be2e338ecfaae675e6de3a` — and later
 releases use the same key, so updating in place keeps the recorded history.
 
@@ -89,7 +89,7 @@ floating navigation pill whose background is a real-time Gaussian blur of the co
 |---|---|
 | 🔋 Live level | Subscribes to Battery Level (`0x2A19`) and updates on notification, with a 60-second poll as fallback. |
 | ⏱️ Charge-cycle duration | Elapsed time from the last 100 % reading to the first reading at or below 10 %. |
-| 📈 History | One point per day as a trend line, plus a per-day table with the last value and the reading count. |
+| 📈 History | One point per day as a trend line with dashed cycle boundaries, plus a per-day table. Completed charge cycles are folded into expandable "Cycle n" groups; a day that closes one cycle and opens the next appears in both. |
 | 📤 Export | CSV through the system file picker. |
 | 🧹 Clear | Removes all stored records. |
 | 🗣️ Languages | English and Simplified Chinese; default follows the system, overridable in app and persisted by the platform. |
@@ -133,7 +133,7 @@ stored history.
 
 Subscribe to `0x180F` → `0x2A19`, enable the client characteristic configuration descriptor, record
 the level on each callback and every 60 seconds, persist one value per day, reconnect with backoff.
-12 Java files, approximately 2 200 lines; a file-by-file map is in
+12 Java files, approximately 2 500 lines; a file-by-file map is in
 [CONTRIBUTING.md](CONTRIBUTING.md#source-map).
 
 ## 🤝 Contributing

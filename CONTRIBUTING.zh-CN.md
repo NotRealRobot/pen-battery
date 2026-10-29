@@ -63,7 +63,7 @@ cp keystore.properties.example keystore.properties   # 然后填写
 
 ## 源码地图
 
-`gradle-app/app/src/main/java/com/playbuddy/penbattery/` —— 12 个文件，约 2 200 行。
+`gradle-app/app/src/main/java/com/playbuddy/penbattery/` —— 12 个文件，约 2 500 行。
 
 | 文件 | 职责 |
 |---|---|
@@ -71,7 +71,7 @@ cp keystore.properties.example keystore.properties   # 然后填写
 | `PenTarget` | 运行时解析目标设备（记住的 → 关键字匹配 → 询问用户），并判断它是否属于已验证型号 |
 | `PenGatt` | GATT 客户端：`0x180F` → `0x2A19`，订阅、60 秒兜底读取、断线后退避重连 |
 | `State` | 每轮刷新一份不可变快照；`shouldMask()` 是判断"什么算不适配"的唯一位置 |
-| `History`、`Samples` | 按天持久化，以及据此推导出的趋势点与本轮周期端点 |
+| `History`、`Samples` | 按天持久化与带时间戳的采样序列；趋势点、本轮周期端点与已封存周期都据此推导 |
 | `BatteryFragment`、`HistoryFragment`、`AboutFragment` | 三个页面 |
 | `Disabled` | "不适配"遮罩面板（半透明填充 + 斜纹 + 短标签） |
 | `Links` | 词级可点击 span，命中判定跟随被标记词语所在行的实际边界 |
