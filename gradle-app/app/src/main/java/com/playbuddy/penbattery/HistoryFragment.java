@@ -40,6 +40,10 @@ public class HistoryFragment extends Fragment {
     private LineChart trend;
     private MaterialTextView runtime, runtimeHint, summary;
     private final Adapter adapter = new Adapter();
+    /** 已封存的周期（进页面时刷新一次），图上画分隔线、明细里生成分组都读它 */
+    private List<Samples.Sealed> sealedNow = new ArrayList<>();
+    /** 哪些分组被展开 —— 只活在本次视图生命周期里，用户要的是"默认封存"，不是持久化的展开状态 */
+    private final java.util.Set<Integer> open = new java.util.HashSet<>();
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup c,
@@ -57,6 +61,10 @@ public class HistoryFragment extends Fragment {
         RecyclerView list = v.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(requireContext()));
         list.setAdapter(adapter);
+        adapter.toggle = cy -> {
+            if (!open.remove(cy.idx)) open.add(cy.idx);
+            adapter.submit(buildRows(requireContext()));
+        };
 
         v.findViewById(R.id.btnExport).setOnClickListener(x -> ((MainActivity) requireActivity()).exportHistory());
         v.findViewById(R.id.btnClear).setOnClickListener(x -> confirmClear());
@@ -74,20 +82,85 @@ public class HistoryFragment extends Fragment {
         if (trend == null) return;
         android.content.Context c = requireContext();
 
-        drawTrend(chartPoints(c));
+        // 先封存再画：图上的分隔线、明细里的分组标题、以及「第 n 周期」的编号都读同一份封存表
+        Samples.sealCompleted(c);
         reloadCycle();
+        drawTrend(chartPoints(c));
 
         int daysWithData = History.countDays(c);
         summary.setText(getString(R.string.overview_summary, DAYS, daysWithData)
                 + NL + getString(R.string.overview_sampling_note));
 
-        String[] dates = History.lastDays(DAYS);
-        String today = dates[0];
+        adapter.submit(buildRows(c));
+    }
+
+    /**
+     * 明细 = 最后一道边界之后的按天行（新的在上）+ 已封存的周期（默认收起）。
+     *
+     * 顺序自下而上由旧到新（用户 10-27 指出）：表头跟日期走同一条轴，所以「第 1 周期」
+     * 落在最底；多轮时越新的表头越靠上。展开的逐日行放在表头**下方**（用户 10-27 要求
+     * 向下展开），块内仍是终点日在上、起点日在下 ⇒ 整表依旧"越往下越旧"。
+     *
+     * 一天可以属于两轮：周期在某天中途收尾 ⇒ 那天既进上一组的尾巴，也在下面**另起一行**
+     * 记新周期从那一刻起的读数（用户 10-22 指出的第 2 点）。
+     */
+    private List<Row> buildRows(android.content.Context c) {
         List<Row> rows = new ArrayList<>();
-        for (String date : dates) {
-            rows.add(new Row(date, History.get(c, date), date.equals(today)));
+        long boundary = -1;
+        for (Samples.Sealed s : sealedNow) boundary = Math.max(boundary, s.endTs);
+
+        String from = boundary > 0 ? dayOf(boundary) : null;
+        String today = History.lastDays(1)[0];
+        for (String date : History.lastDays(DAYS)) {
+            if (from != null && date.compareTo(from) < 0) continue;   // 更早的天已归入下面的分组
+            History.Day rec = History.get(c, date);
+            if (from != null && date.equals(from) && rec != null && rec.tsMillis() <= boundary) {
+                rec = null;   // 那天的最后一次读数属于上一轮 ⇒ 新周期在这天还没有自己的读数
+            }
+            rows.add(Row.day(date, rec, date.equals(today)));
         }
-        adapter.submit(rows);
+
+        // 已封存的周期倒序铺：最新的先、第 1 周期最后（== 最底）
+        for (int i = sealedNow.size() - 1; i >= 0; i--) {
+            Samples.Sealed s = sealedNow.get(i);
+            boolean opened = open.contains(s.idx);
+            rows.add(Row.head(s, opened));
+            if (opened) rows.addAll(groupDays(c, s));
+        }
+        return rows;
+    }
+
+    /**
+     * 一个封存周期名下的按天行：当天的收尾值取「周期窗口内最后一个点」，不是当天全局最后一次。
+     * 从终点日往回铺，接在表头下方 ⇒ 与整表同向：越往下越旧。
+     */
+    private List<Row> groupDays(android.content.Context c, Samples.Sealed s) {
+        List<Row> out = new ArrayList<>();
+        java.time.LocalDate d = day(s.endTs), first = day(s.startTs);
+        String today = History.lastDays(1)[0];
+        while (!d.isBefore(first)) {
+            String date = d.format(DF);
+            long ds = startOfDay(d.atStartOfDay(ZONE).toInstant().toEpochMilli());
+            long from = Math.max(ds, s.startTs), to = Math.min(ds + 86_399_999L, s.endTs);
+            Samples.Point p = Samples.lastBetween(c, from, to);
+            int cnt = Samples.countBetween(c, from, to);
+            if (p == null) {
+                // 采样按条数截断，老周期的点可能已经掉了 ⇒ 退回到按天表，只要那条记录落在本窗口内
+                History.Day h = History.get(c, date);
+                if (h != null && h.tsMillis() >= from && h.tsMillis() <= to) {
+                    p = new Samples.Point(h.tsMillis(), h.pct);
+                    cnt = h.count;
+                }
+            }
+            out.add(Row.day(date, p == null ? null : new History.Day(date, p.pct, TIME.format(ts(p.ts)), cnt),
+                    date.equals(today)));
+            d = d.minusDays(1);
+        }
+        return out;
+    }
+
+    private static java.time.LocalDate day(long ms) {
+        return Instant.ofEpochMilli(ms).atZone(ZONE).toLocalDate();
     }
 
     private static final String NL = String.valueOf((char) 10);
@@ -119,6 +192,12 @@ public class HistoryFragment extends Fragment {
     private static final java.time.ZoneId ZONE = java.time.ZoneId.systemDefault();
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter DAY_LABEL = DateTimeFormatter.ofPattern("MM-dd");
+    /**
+     * 封存行的时间精确到秒：周期终点那天往往既有旧周期的 4% 又有充回后的 100%，
+     * 只显示到分钟分不清"这一行到底是哪一笔"（用户 10-26 的实际数据）。
+     * 展开区的按天行本来就带秒（按天表存的就是 HH:mm:ss），两边口径一致。
+     */
+    private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private static String dayOf(long ms) {
         return java.time.Instant.ofEpochMilli(ms).atZone(ZONE).toLocalDate().format(DF);
@@ -170,6 +249,7 @@ public class HistoryFragment extends Fragment {
 
         if (pts.isEmpty()) {
             trend.clear();
+            x.removeAllLimitLines();      // 没数据也要把上一轮的边界线清掉，否则空图上会留着竖线
             x.setValueFormatter(null);
             trend.invalidate();
             return;
@@ -195,6 +275,17 @@ public class HistoryFragment extends Fragment {
         ds.setFillAlpha(38);
         trend.setData(new LineData(ds));
 
+        // 完整周期的两端各画一条竖线：起点 = 读到 100% 那刻，终点 = 其后第一次 ≤10% 那刻。
+        // 进行中的那一轮只画起点 —— 终点还不存在，画了就是撒谎。
+        // （这个开关在 AxisBase 上，不在 Chart 上 —— 3.1.0 实测）
+        x.setDrawLimitLinesBehindData(true);
+        x.removeAllLimitLines();
+        for (Samples.Sealed s : sealedNow) {
+            addBoundary(x, s.startTs, day0, primary);
+            addBoundary(x, s.endTs, day0, primary);
+        }
+        if (cyStart > 0) addBoundary(x, cyStart, day0, primary);
+
         x.setAxisMinimum(0f);
         x.setAxisMaximum(Math.max(1f, (lastTs - day0) / 86_400_000f));
         x.setLabelCount((int) Math.min(7f, Math.max(2f, (lastTs - day0) / 86_400_000f + 1)), false);
@@ -205,6 +296,18 @@ public class HistoryFragment extends Fragment {
             }
         });
         trend.invalidate();
+    }
+
+    /** 一条周期边界竖线；时刻落在可视窗口左边之外就不画（老周期的端点可能已在 30 天窗口外） */
+    private static void addBoundary(XAxis axis, long ms, long day0, int primary) {
+        float xp = (ms - day0) / 86_400_000f;
+        if (xp < 0f) return;
+        com.github.mikephil.charting.components.LimitLine l =
+                new com.github.mikephil.charting.components.LimitLine(xp);
+        l.setLineColor(ColorUtils.setAlphaComponent(primary, 150));
+        l.setLineWidth(1.6f);
+        l.enableDashedLine(10f, 6f, 0f);
+        axis.addLimitLine(l);
     }
 
     /**
@@ -248,6 +351,7 @@ public class HistoryFragment extends Fragment {
         android.content.Context c = getContext();
         if (c == null) return;
         lastDbMs = System.currentTimeMillis();
+        sealedNow = Samples.sealed(c);
         showRuntime(Samples.cycle(c, DAYS, History.lastFullTs(c)));
         applyMasks();          // 标签要按"本轮还在不在计时"定，所以放在拿到端点之后
         schedule();
@@ -323,17 +427,24 @@ public class HistoryFragment extends Fragment {
     }
 
     // ---------------------------------------------------- 列表
+    /** 一行要么是「第 n 周期」的分组标题，要么是某天在该周期里的读数 */
     private static class Row {
+        final Samples.Sealed head;
         final String date;
         final History.Day rec;
         final boolean today;
-        Row(String date, History.Day rec, boolean today) {
-            this.date = date; this.rec = rec; this.today = today;
+        final boolean opened;
+        private Row(Samples.Sealed head, String date, History.Day rec, boolean today, boolean opened) {
+            this.head = head; this.date = date; this.rec = rec; this.today = today; this.opened = opened;
         }
+        static Row head(Samples.Sealed s, boolean opened) { return new Row(s, null, null, false, opened); }
+        static Row day(String date, History.Day rec, boolean today) { return new Row(null, date, rec, today, false); }
     }
 
-    private static class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
+    private static class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private static final int TYPE_HEAD = 0, TYPE_DAY = 1;
         private final List<Row> data = new ArrayList<>();
+        java.util.function.Consumer<Samples.Sealed> toggle;
 
         void submit(List<Row> rows) {
             data.clear();
@@ -341,37 +452,62 @@ public class HistoryFragment extends Fragment {
             notifyDataSetChanged();
         }
 
-        @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup p, int t) {
-            View v = LayoutInflater.from(p.getContext()).inflate(R.layout.item_history, p, false);
-            return new Holder(v);
+        @Override public int getItemViewType(int position) { return data.get(position).head != null ? TYPE_HEAD : TYPE_DAY; }
+
+        @NonNull @Override public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int t) {
+            LayoutInflater inf = LayoutInflater.from(p.getContext());
+            return t == TYPE_HEAD ? new HeadHolder(inf.inflate(R.layout.item_cycle_header, p, false))
+                                  : new Holder(inf.inflate(R.layout.item_history, p, false));
         }
 
-        @Override public void onBindViewHolder(@NonNull Holder h, int i) {
+        @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int i) {
             Row r = data.get(i);
-            Context2 c = new Context2(h.itemView);
-            h.date.setText(r.date.substring(5) + "  " + weekday(h.itemView.getContext(), r.date));
-            h.date.setTextColor(r.today ? c.color(R.attr.colorOnSurface)
+            if (h instanceof HeadHolder) {
+                HeadHolder hh = (HeadHolder) h;
+                android.content.Context ctx = hh.itemView.getContext();
+                hh.title.setText(ctx.getString(R.string.cycle_sealed, r.head.idx));
+                hh.range.setText(ctx.getString(R.string.cycle_range,
+                        TS_FMT.format(ts(r.head.startTs)), TS_FMT.format(ts(r.head.endTs))));
+                hh.caret.setText(ctx.getString(r.opened ? R.string.caret_expanded : R.string.caret_collapsed));
+                hh.itemView.setContentDescription(ctx.getString(R.string.cycle_toggle));
+                hh.itemView.setOnClickListener(v -> { if (toggle != null) toggle.accept(r.head); });
+                return;
+            }
+            Holder d = (Holder) h;
+            Context2 c = new Context2(d.itemView);
+            d.date.setText(r.date.substring(5) + "  " + weekday(d.itemView.getContext(), r.date));
+            d.date.setTextColor(r.today ? c.color(R.attr.colorOnSurface)
                     : c.color(R.attr.colorOnSurfaceVariant));
             // 回收复用 ⇒ 两个分支都必须显式设，否则上一行的红底会跟着跑
-            h.itemView.setBackgroundColor(r.rec != null && r.rec.pct <= LOW_WARN_PCT
+            d.itemView.setBackgroundColor(r.rec != null && r.rec.pct <= LOW_WARN_PCT
                     ? ColorUtils.setAlphaComponent(c.color(R.attr.colorError), 40)
                     : android.graphics.Color.TRANSPARENT);
             if (r.rec == null) {
-                h.level.setText("—");
-                h.level.setTextColor(c.color(R.attr.colorOutline));
-                h.last.setText(R.string.no_record);
-                h.count.setText("");
+                d.level.setText("—");
+                d.level.setTextColor(c.color(R.attr.colorOutline));
+                d.last.setText(R.string.no_record);
+                d.count.setText("");
             } else {
-                h.level.setText(r.rec.pct + "%");
-                h.level.setTextColor(r.rec.pct <= 20
+                d.level.setText(r.rec.pct + "%");
+                d.level.setTextColor(r.rec.pct <= 20
                         ? c.color(R.attr.colorError)
                         : c.color(android.R.attr.textColorPrimary));
-                h.last.setText(r.rec.time);
-                h.count.setText(h.itemView.getContext().getString(R.string.count_times, r.rec.count));
+                d.last.setText(r.rec.time);
+                d.count.setText(d.itemView.getContext().getString(R.string.count_times, r.rec.count));
             }
         }
 
         @Override public int getItemCount() { return data.size(); }
+
+        static class HeadHolder extends RecyclerView.ViewHolder {
+            final MaterialTextView caret, title, range;
+            HeadHolder(View v) {
+                super(v);
+                caret = v.findViewById(R.id.cycleCaret);
+                title = v.findViewById(R.id.cycleTitle);
+                range = v.findViewById(R.id.cycleRange);
+            }
+        }
 
         static class Holder extends RecyclerView.ViewHolder {
             final MaterialTextView date, level, last, count;
