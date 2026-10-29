@@ -117,15 +117,16 @@ public class MainActivity extends AppCompatActivity {
      * 设置 = 目前只有语言。选项按"与系统语言重合就合并"的规则生成：
      * 系统中文 ⇒「跟随系统（简体中文）」+ English（不再单列简体中文）；
      * 系统英文 ⇒「System default (English)」+ 简体中文；其他语言 ⇒ 三项都在。
-     * 括号里的语言名用该语言自己的写法（zh-Hans 的 display name 才是"简体中文"，
-     * 光用 zh 只会得到"中文"）。
+     * 括号里的语言名用该语言自己的写法。中文不能走 Locale.getDisplayLanguage —— 它只认
+     * language 字段（zh），脚本被丢掉，得到的永远是"中文"；lang_zh 在两个语种下都正好是
+     * "简体中文"，与下面那个选项的写法一致。
      */
     private void showSettings() {
         Locale sys = Resources.getSystem().getConfiguration().getLocales().get(0);
         String sysTag = sys.getLanguage();
-        Locale shown = "zh".equals(sysTag)
-                ? Locale.forLanguageTag("zh-Hans") : Locale.forLanguageTag(sysTag);
-        String sysName = shown.getDisplayLanguage(shown);
+        Locale shown = Locale.forLanguageTag(sysTag);
+        String sysName = "zh".equals(sysTag)
+                ? getString(R.string.lang_zh) : shown.getDisplayLanguage(shown);
 
         final java.util.List<String> labels = new java.util.ArrayList<>();
         final java.util.List<String> tags = new java.util.ArrayList<>();
