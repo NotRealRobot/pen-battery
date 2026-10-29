@@ -94,6 +94,12 @@
     <string name="none_yet">暂无</string>
     <string name="version_unavailable">版本信息不可用</string>
     <string name="count_times">%1$d 次</string>
+    <!-- 明细里已走完的周期会被折叠封存：标题 = 第 n 周期 + 起止时刻 -->
+    <string name="cycle_sealed">第 %1$d 周期</string>
+    <string name="cycle_range">%1$s – %2$s</string>
+    <string name="cycle_toggle">展开或收起该周期</string>
+    <string name="caret_collapsed">▸</string>
+    <string name="caret_expanded">▾</string>
     <string name="count_days">%1$d 天</string>
     <string name="dur_dhm">%1$d 天 %2$d 小时 %3$d 分</string>
     <string name="dur_hm">%1$d 小时 %2$d 分</string>

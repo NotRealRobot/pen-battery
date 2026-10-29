@@ -101,6 +101,12 @@
     <string name="none_yet">None</string>
     <string name="version_unavailable">Unavailable</string>
     <string name="count_times">%1$d reads</string>
+    <!-- 明细里已走完的周期会被折叠封存：标题 = 第 n 周期 + 起止时刻 -->
+    <string name="cycle_sealed">Cycle %1$d</string>
+    <string name="cycle_range">%1$s – %2$s</string>
+    <string name="cycle_toggle">Expand or collapse this cycle</string>
+    <string name="caret_collapsed">▸</string>
+    <string name="caret_expanded">▾</string>
     <string name="count_days">%1$d days</string>
     <string name="dur_dhm">%1$dd %2$dh %3$dm</string>
     <string name="dur_hm">%1$dh %2$dm</string>
