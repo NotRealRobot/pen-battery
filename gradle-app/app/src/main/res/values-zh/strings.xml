@@ -78,7 +78,6 @@
     <string name="dlg_pick_title">选择要读取电量的设备</string>
 
     <string name="disabled_level">设备不适配</string>
-    <string name="mask_no_target">未连接到设备</string>
     <string name="link_bt_on">点我打开蓝牙</string>
     <string name="link_switch_device">点我切换连接设备</string>
     <string name="status_bt_off">请打开蓝牙</string>
@@ -126,12 +125,6 @@
 
     <string name="src_read">读取</string>
     <string name="src_notify">通知</string>
-    <string name="src_pull">手动下拉刷新</string>
-    <string name="src_poll">定时兜底</string>
-    <string name="src_cccd_timeout">CCCD 超时兜底</string>
-    <string name="src_no_cccd">无 CCCD</string>
-    <string name="src_sub_done">订阅完成</string>
-    <string name="src_step_guard">步进异常兜底</string>
 
     <string name="action_settings">设置</string>
     <string name="dlg_lang_title">语言</string>

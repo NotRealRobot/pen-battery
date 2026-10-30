@@ -86,7 +86,6 @@
 
     <!-- 遮罩文案：短、说现状；可点的那几个字单独给 -->
     <string name="disabled_level">Not supported</string>
-    <string name="mask_no_target">No device</string>
     <string name="link_bt_on">Turn on Bluetooth</string>
     <string name="link_switch_device">Choose a device</string>
     <string name="status_bt_off">Turn on Bluetooth</string>
@@ -135,12 +134,6 @@
 
     <string name="src_read">read</string>
     <string name="src_notify">notify</string>
-    <string name="src_pull">pull-to-refresh</string>
-    <string name="src_poll">periodic poll</string>
-    <string name="src_cccd_timeout">CCCD timeout</string>
-    <string name="src_no_cccd">no CCCD</string>
-    <string name="src_sub_done">subscribed</string>
-    <string name="src_step_guard">step guard</string>
 
     <!-- 设置 / 语言 -->
     <string name="action_settings">Settings</string>

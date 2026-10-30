@@ -78,7 +78,6 @@
     <string name="dlg_pick_title">選擇要讀取電量的裝置</string>
 
     <string name="disabled_level">裝置不支援</string>
-    <string name="mask_no_target">未連線裝置</string>
     <string name="link_bt_on">點我開啟藍牙</string>
     <string name="link_switch_device">點我切換連線裝置</string>
     <string name="status_bt_off">請開啟藍牙</string>
@@ -125,12 +124,6 @@
 
     <string name="src_read">讀取</string>
     <string name="src_notify">通知</string>
-    <string name="src_pull">手動下拉重新整理</string>
-    <string name="src_poll">定期輪詢後備</string>
-    <string name="src_cccd_timeout">CCCD 超時後備</string>
-    <string name="src_no_cccd">無 CCCD</string>
-    <string name="src_sub_done">訂閱完成</string>
-    <string name="src_step_guard">步進異常後備</string>
 
     <string name="action_settings">設定</string>
     <string name="dlg_lang_title">語言</string>
