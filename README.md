@@ -25,7 +25,7 @@ never shows it.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| 🔌 **Standard GATT**<br>`0x180F` → `0x2A19` | 📴 **Offline by design**<br>no `INTERNET` permission | 🗣️ **Two languages**<br>follows the system | 🧭 **Runtime target**<br>no address baked in |
+| 🔌 **Standard GATT**<br>`0x180F` → `0x2A19` | 📴 **Offline by design**<br>no `INTERNET` permission | 🗣️ **Four languages**<br>follows the system | 🧭 **Runtime target**<br>no address baked in |
 
 <details open>
 <summary>📖 Contents</summary>
@@ -51,7 +51,8 @@ directly over GATT and records the readings locally.
 - No network access: the manifest declares no `INTERNET` permission.
 - The target device is selected at runtime rather than fixed at build time; the Dell PN7522W
   remains the only model verified so far.
-- English and Simplified Chinese, following the system language.
+- English, Simplified Chinese and Traditional Chinese (Taiwan and Hong Kong), following the
+  system language.
 
 ## ⬇️ Installation
 
@@ -92,7 +93,7 @@ floating navigation pill whose background is a real-time Gaussian blur of the co
 | 📈 History | One point per day as a trend line with dashed cycle boundaries, plus a per-day table. Completed charge cycles are folded into expandable "Cycle n" groups; a day that closes one cycle and opens the next appears in both. |
 | 📤 Export | CSV through the system file picker. |
 | 🧹 Clear | Removes all stored records. |
-| 🗣️ Languages | English and Simplified Chinese; default follows the system, overridable in app and persisted by the platform. |
+| 🗣️ Languages | English, Simplified Chinese and Traditional Chinese (Taiwan and Hong Kong); default follows the system, overridable in app and persisted by the platform. |
 | 🎨 Interface | Material 3 components, light and dark themes, floating navigation pill with a real-time Gaussian blur. |
 
 ## 🔒 Permissions and privacy
@@ -139,7 +140,7 @@ the level on each callback and every 60 seconds, persist one value per day, reco
 ## 🤝 Contributing
 
 Issue reports and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) documents the build
-environment, the translation constraint (the two `strings.xml` files must keep identical key sets)
+environment, the translation constraint (every `strings.xml` must keep an identical key set)
 and the policy that new permissions require a specific justification.
 
 ## 📚 Third-party notices

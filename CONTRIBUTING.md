@@ -84,9 +84,17 @@ authority should not travel with them.
 ## Translations
 
 `app/src/main/res/values/strings.xml` is the **English default** (AOSP convention: the
-unqualified resource is the fallback), and `values-zh/strings.xml` is the Chinese mirror.
+unqualified resource is the fallback). Simplified Chinese lives in `values-zh/`, Traditional
+Chinese in `values-zh-rTW/` (Taiwan), `values-zh-rHK/` (Hong Kong) and `values-b+zh+Hant/`
+(the fallback used when the system reports `zh-Hant` without a region; it follows Taiwan usage,
+which is AOSP's default region for `zh-Hant`).
 
-- Key sets must stay identical. A missing key silently falls back to English inside a Chinese UI.
+- Key sets must stay identical across all five files; `tools/check_strings.py` checks keys and
+  format arguments and runs as part of the pre-push sequence. A missing key silently falls back
+  to English inside a translated UI.
+- Wording follows each region's own usage: 裝置 / 應用程式 / 資料 / 逾時 / 備援 / 週一 in Taiwan,
+  數據 / 超時 / 後備 / 星期一 in Hong Kong, 设备 / 应用 / 记录 in the mainland. Don't copy one
+  Chinese variant over another.
 - Strings that only ever reach logcat are deliberately left in Chinese: they are debugging output
   and shouldn't follow the interface language.
 - Anything user-visible must be a resource, never a literal in Java. Status text is compared by

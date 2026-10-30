@@ -79,10 +79,15 @@ cp keystore.properties.example keystore.properties   # 然后填写
 
 ## 翻译
 
-`app/src/main/res/values/strings.xml` 是**英文默认**（AOSP 惯例：无限定符的资源是兜底），
-`values-zh/strings.xml` 是中文镜像。
+`app/src/main/res/values/strings.xml` 是**英文默认**（AOSP 惯例：无限定符的资源是兜底）。
+简体中文在 `values-zh/`；繁体中文分三份：`values-zh-rTW/`（台湾）、`values-zh-rHK/`（香港），
+以及系统只报 `zh-Hant`（不带地区）时兜底的 `values-b+zh+Hant/` —— 兜底用字依台湾惯例，
+那是 AOSP 给 `zh-Hant` 的默认地区。
 
-- 两边键集必须完全一致。少一个键，那一行会在中文界面里静默掉回英文。
+- 五份文件键集必须完全一致；`tools/check_strings.py` 会核对键名与格式化参数，并已接进推前流程。
+  少一个键，那一行会在该语言界面里静默掉回英文。
+- 用词按各地区自己的习惯：台湾用 裝置／應用程式／資料／逾時／備援／週一，香港用 數據／超時／
+  後備／星期一，大陆用 设备／应用／记录。不要把一种中文的写法直接套到另一种上。
 - 只进 logcat 的文字故意保留中文：那是排障输出，不该跟着界面语言变。
 - 任何可见文字都必须是资源，不允许在 Java 里写死。状态文字按资源 id 比较（`State.statusRes`），
   不比较字符串内容 —— 一旦按译文匹配，换语言当场失效。
