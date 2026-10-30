@@ -119,40 +119,48 @@ public class MainActivity extends AppCompatActivity {
             R.string.lang_en, R.string.lang_zh, R.string.lang_zh_tw, R.string.lang_zh_hk};
 
     /**
-     * 设置 = 目前只有语言。选项按"与系统语言重合就合并"的规则生成：
-     * 系统中文 ⇒「跟随系统（简体中文）」+ English + 两个繁体；系统英文 ⇒ 反过来；
-     * 系统是其他语言 ⇒ 四项都在。括号里的语言名用该语言自己的写法 —— 中文不能走
-     * Locale.getDisplayLanguage：它按 language 字段（zh）取，脚本与地区都被丢掉，
-     * 四种中文会显示成同一个"中文"。
+     * 设置 = 目前只有语言。先把系统语言真读出来，再决定"跟随系统"要不要单独成一项：
+     * 系统语言就是这四种之一 ⇒ 语言列表里那一项本身即"跟随系统"（选中它就清空覆盖，
+     * 系统语言以后再变、界面跟着变），不再额外多一行；只有系统语言是别的语言时
+     *（会落到英文默认资源）才补一行"跟随系统（xx）"，否则这种状态无法表示。
+     * "跟随系统"这个说法只挂在"当前选中的就是系统语言"的那一项上。
+     * 括号里的语言名用该语言自己的写法 —— 中文不能走 Locale.getDisplayLanguage：它按
+     * language 字段（zh）取，脚本与地区都被丢掉，四种中文会显示成同一个"中文"。
      */
     private void showSettings() {
         String sysTag = supported(Resources.getSystem().getConfiguration()
                 .getLocales().get(0).toLanguageTag());
-
-        final java.util.List<String> labels = new java.util.ArrayList<>();
-        final java.util.List<String> tags = new java.util.ArrayList<>();
-        labels.add(getString(R.string.lang_system_of, langName(sysTag))); tags.add(null);
+        int sysIdx = -1;
         for (int i = 0; i < LANG_TAGS.length; i++) {
-            if (LANG_TAGS[i].equals(sysTag)) continue;          // 与系统重合就不单列
-            labels.add(getString(LANG_LABELS[i])); tags.add(LANG_TAGS[i]);
+            if (LANG_TAGS[i].equals(sysTag)) sysIdx = i;
         }
 
         LocaleListCompat now = AppCompatDelegate.getApplicationLocales();
-        int cur = 0;
-        if (!now.isEmpty()) {
-            String t = supported(now.toLanguageTags());
-            for (int i = 1; i < tags.size(); i++) {             // 0 号永远是"跟随系统"
-                if (t.equals(tags.get(i))) { cur = i; break; }
-            }
+        String curTag = now.isEmpty() ? sysTag : supported(now.toLanguageTags());
+
+        final java.util.List<String> labels = new java.util.ArrayList<>();
+        final java.util.List<String> tags = new java.util.ArrayList<>();
+        if (sysIdx < 0) {
+            labels.add(getString(R.string.lang_system_of, langName(sysTag)));
+            tags.add(null);
         }
+        for (int i = 0; i < LANG_TAGS.length; i++) {
+            labels.add(LANG_TAGS[i].equals(curTag)
+                    ? getString(R.string.lang_system_of, getString(LANG_LABELS[i]))
+                    : getString(LANG_LABELS[i]));
+            tags.add(LANG_TAGS[i]);
+        }
+        int cur = tags.indexOf(curTag);
+        if (cur < 0) cur = 0;
 
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.dlg_lang_title)
                 .setSingleChoiceItems(labels.toArray(new String[0]), cur, (d, w) -> {
                     d.dismiss();
                     String g = tags.get(w);
-                    AppCompatDelegate.setApplicationLocales(g == null
-                            ? LocaleListCompat.getEmptyLocaleList()      // 跟随系统 = 清空覆盖
+                    // 选中的就是系统语言 ⇒ 不钉死，清空覆盖
+                    AppCompatDelegate.setApplicationLocales(g == null || g.equals(sysTag)
+                            ? LocaleListCompat.getEmptyLocaleList()
                             : LocaleListCompat.forLanguageTags(g));
                 })
                 .setNegativeButton(R.string.dlg_cancel, null)
