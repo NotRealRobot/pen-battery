@@ -118,45 +118,40 @@ public class MainActivity extends AppCompatActivity {
             R.string.lang_en, R.string.lang_zh, R.string.lang_zh_tw, R.string.lang_zh_hk};
 
     /**
-     * 设置 = 目前只有语言。列表永远只有这四种语言，**没有"跟随系统"这一项**：
-     * 系统语言不受支持时（如日语）系统默认只会落到英文，摆一个"跟随系统（日本語）"
-     * 等于给用户一个名不副实的选项。
-     * 规则：当前生效的语言 = 有覆盖就用它、没有就按系统语言（不支持则英文）⇒ 打勾的那一项。
-     * "跟随系统"只是语义、不是选项：点中的恰好是系统语言就清空覆盖（系统语言以后再变、
-     * 界面跟着变），点别的语言则钉死。所以"跟随系统"字样只出现在真正跟随、且系统语言
-     * 就在这四项里的那一项上，其余一律只写语言名。
+     * 设置 = 目前只有语言。列表永远是这四种语言，没有额外的"跟随系统"选项 ——
+     * 「跟随系统」是**语言本身的一个特征**：系统默认语言就在这四种里时，它自己那一项
+     * 一直带着这个说法（不管当前钉死在哪种语言）；系统默认语言不在这四种里时
+     * （如日语，界面只会落到英文），四项都只写语言名，不出现这个说法。
+     * 点语言 = 钉死；点带"跟随系统"的那一项 = 清空覆盖（系统语言以后再变、界面跟着变），
+     * 两者当前效果相同，但后者让界面继续跟着系统走。
      * 语言名用各语言自己的写法（资源里的 lang_*），不能走 Locale.getDisplayLanguage：
      * 它按 language 字段（zh）取，脚本与地区都被丢掉，三种中文会显示成同一个"中文"。
      */
     private void showSettings() {
         String sysTag = supported(Resources.getSystem().getConfiguration()
                 .getLocales().get(0).toLanguageTag());
-        boolean sysKnown = false;                                 // 系统语言是否就在这四种里
-        for (String t : LANG_TAGS) {
-            if (t.equals(sysTag)) sysKnown = true;
-        }
 
         LocaleListCompat now = AppCompatDelegate.getApplicationLocales();
         // 没有覆盖时实际生效的就是系统语言；系统语言不支持，落到英文默认资源
-        String curTag = now.isEmpty() ? (sysKnown ? sysTag : "en") : supported(now.toLanguageTags());
+        String curTag = now.isEmpty() ? sysTag : supported(now.toLanguageTags());
 
         final java.util.List<String> labels = new java.util.ArrayList<>();
         final java.util.List<String> tags = new java.util.ArrayList<>();
         for (int i = 0; i < LANG_TAGS.length; i++) {
-            labels.add(now.isEmpty() && LANG_TAGS[i].equals(sysTag)
+            labels.add(LANG_TAGS[i].equals(sysTag)
                     ? getString(R.string.lang_system_of, getString(LANG_LABELS[i]))
                     : getString(LANG_LABELS[i]));
             tags.add(LANG_TAGS[i]);
         }
         int cur = tags.indexOf(curTag);
-        if (cur < 0) cur = 0;
+        if (cur < 0) cur = 0;      // 系统语言不在这四种里 ⇒ 界面落到的就是 0 号英文（values/ 默认资源）
 
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.dlg_lang_title)
                 .setSingleChoiceItems(labels.toArray(new String[0]), cur, (d, w) -> {
                     d.dismiss();
                     String g = tags.get(w);
-                    // 选中的就是系统语言 ⇒ 不钉死，清空覆盖；其余一律钉死
+                    // 带"跟随系统"的那一项 = 不钉死，清空覆盖
                     AppCompatDelegate.setApplicationLocales(g.equals(sysTag)
                             ? LocaleListCompat.getEmptyLocaleList()
                             : LocaleListCompat.forLanguageTags(g));
