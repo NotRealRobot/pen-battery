@@ -24,8 +24,8 @@ android {
         applicationId 'com.playbuddy.penbattery'
         minSdk 33
         targetSdk 33
-        versionCode 73
-        versionName '2.8.0'
+        versionCode 74
+        versionName '2.8.1'
     }
 
     signingConfigs {
