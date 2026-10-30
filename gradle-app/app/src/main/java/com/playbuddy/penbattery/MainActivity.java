@@ -123,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
      * 系统语言就是这四种之一 ⇒ 语言列表里那一项本身即"跟随系统"（选中它就清空覆盖，
      * 系统语言以后再变、界面跟着变），不再额外多一行；只有系统语言是别的语言时
      *（会落到英文默认资源）才补一行"跟随系统（xx）"，否则这种状态无法表示。
-     * "跟随系统"这个说法只挂在"当前选中的就是系统语言"的那一项上。
+     * "跟随系统"这个说法只挂在"真正在跟随系统、且它就是系统语言"的那一项上：钉死了别的语言、
+     * 或钉死的恰好也是系统语言时，都只写语言名。
      * 括号里的语言名用该语言自己的写法 —— 中文不能走 Locale.getDisplayLanguage：它按
      * language 字段（zh）取，脚本与地区都被丢掉，四种中文会显示成同一个"中文"。
      */
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             tags.add(null);
         }
         for (int i = 0; i < LANG_TAGS.length; i++) {
-            labels.add(LANG_TAGS[i].equals(curTag)
+            labels.add(now.isEmpty() && LANG_TAGS[i].equals(sysTag)
                     ? getString(R.string.lang_system_of, getString(LANG_LABELS[i]))
                     : getString(LANG_LABELS[i]));
             tags.add(LANG_TAGS[i]);
