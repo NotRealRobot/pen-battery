@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 电量目标的来源：系统已配对列表，运行时解析，本地记住用户的选择。
@@ -78,7 +79,7 @@ public final class PenTarget {
      */
     public static BluetoothDevice autoSelect(Context c) {
         for (BluetoothDevice d : candidates(c)) {
-            String n = safeName(d).toLowerCase();
+            String n = safeName(d).toLowerCase(Locale.ROOT);
             for (String k : KEYS) if (n.contains(k)) return d;
         }
         return null;

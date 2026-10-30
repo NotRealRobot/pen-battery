@@ -1,5 +1,6 @@
 package com.playbuddy.penbattery;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -9,7 +10,6 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -27,7 +27,10 @@ import java.util.UUID;
  * ★ 所有回调统一在主线程触发（内部 post），调用方不必关心线程。
  * ★ 修过的坑：读链守卫不能写成 "step != IDLE 就返回" ——
  *   它正是从 onDescriptorWrite 里调用的，那样会被自己挡掉。
+ * ★ 权限：`BLUETOOTH_CONNECT` 由 MainActivity 在拿到 GATT 之前确认，本类只在已授予时被调用；
+ *   整类静音 lint 的 MissingPermission —— 它看不到这条跨方法的保证。
  */
+@SuppressLint("MissingPermission")
 public final class PenGatt {
 
     public interface Sink {

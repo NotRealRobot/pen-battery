@@ -30,7 +30,6 @@ public final class Samples {
         public final long startTs;
         public final long endTs;
         Cycle(long startTs, long endTs) { this.startTs = startTs; this.endTs = endTs; }
-        public boolean complete() { return startTs > 0 && endTs > 0; }
     }
 
     /** 一个已封存（走完）的周期：idx 是它在库里的序号，也就是界面上的「第 n 周期」。 */
