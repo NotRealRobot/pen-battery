@@ -1,6 +1,7 @@
 package com.playbuddy.penbattery;
 
 import android.Manifest;
+import android.app.LocaleManager;
 import android.content.Intent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -11,6 +12,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.view.View;
 import android.view.MenuItem;
 
@@ -126,10 +128,12 @@ public class MainActivity extends AppCompatActivity {
      * 两者当前效果相同，但后者让界面继续跟着系统走。
      * 语言名用各语言自己的写法（资源里的 lang_*），不能走 Locale.getDisplayLanguage：
      * 它按 language 字段（zh）取，脚本与地区都被丢掉，三种中文会显示成同一个"中文"。
+     * 系统语言必须走 LocaleManager.getSystemLocales()：`Resources.getSystem()` 的配置会跟着
+     * 应用语言覆盖一起变（实测 App 钉死 zh-CN、系统 en-US 时它报 zh-CN），用它会让
+     * 「跟随系统」永远落在刚选的那一项上 —— 2.8.3 就是这么错的。
      */
     private void showSettings() {
-        String sysTag = supported(Resources.getSystem().getConfiguration()
-                .getLocales().get(0).toLanguageTag());
+        String sysTag = supported(systemLanguageTag());
 
         LocaleListCompat now = AppCompatDelegate.getApplicationLocales();
         // 没有覆盖时实际生效的就是系统语言；系统语言不支持，落到英文默认资源
@@ -158,6 +162,14 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(R.string.dlg_cancel, null)
                 .show();
+    }
+
+    /** 系统设置里的语言（不受本应用的 per-app 语言覆盖影响） */
+    private String systemLanguageTag() {
+        LocaleManager lm = getSystemService(LocaleManager.class);
+        LocaleList sl = lm == null ? null : lm.getSystemLocales();
+        if (sl != null && !sl.isEmpty()) return sl.get(0).toLanguageTag();
+        return Resources.getSystem().getConfiguration().getLocales().get(0).toLanguageTag();
     }
 
     /**
