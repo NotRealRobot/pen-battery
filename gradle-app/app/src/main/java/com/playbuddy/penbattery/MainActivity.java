@@ -18,7 +18,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import java.util.Locale;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
@@ -119,32 +118,30 @@ public class MainActivity extends AppCompatActivity {
             R.string.lang_en, R.string.lang_zh, R.string.lang_zh_tw, R.string.lang_zh_hk};
 
     /**
-     * 设置 = 目前只有语言。先把系统语言真读出来，再决定"跟随系统"要不要单独成一项：
-     * 系统语言就是这四种之一 ⇒ 语言列表里那一项本身即"跟随系统"（选中它就清空覆盖，
-     * 系统语言以后再变、界面跟着变），不再额外多一行；只有系统语言是别的语言时
-     *（会落到英文默认资源）才补一行"跟随系统（xx）"，否则这种状态无法表示。
-     * "跟随系统"这个说法只挂在"真正在跟随系统、且它就是系统语言"的那一项上：钉死了别的语言、
-     * 或钉死的恰好也是系统语言时，都只写语言名。
-     * 括号里的语言名用该语言自己的写法 —— 中文不能走 Locale.getDisplayLanguage：它按
-     * language 字段（zh）取，脚本与地区都被丢掉，四种中文会显示成同一个"中文"。
+     * 设置 = 目前只有语言。列表永远只有这四种语言，**没有"跟随系统"这一项**：
+     * 系统语言不受支持时（如日语）系统默认只会落到英文，摆一个"跟随系统（日本語）"
+     * 等于给用户一个名不副实的选项。
+     * 规则：当前生效的语言 = 有覆盖就用它、没有就按系统语言（不支持则英文）⇒ 打勾的那一项。
+     * "跟随系统"只是语义、不是选项：点中的恰好是系统语言就清空覆盖（系统语言以后再变、
+     * 界面跟着变），点别的语言则钉死。所以"跟随系统"字样只出现在真正跟随、且系统语言
+     * 就在这四项里的那一项上，其余一律只写语言名。
+     * 语言名用各语言自己的写法（资源里的 lang_*），不能走 Locale.getDisplayLanguage：
+     * 它按 language 字段（zh）取，脚本与地区都被丢掉，三种中文会显示成同一个"中文"。
      */
     private void showSettings() {
         String sysTag = supported(Resources.getSystem().getConfiguration()
                 .getLocales().get(0).toLanguageTag());
-        int sysIdx = -1;
-        for (int i = 0; i < LANG_TAGS.length; i++) {
-            if (LANG_TAGS[i].equals(sysTag)) sysIdx = i;
+        boolean sysKnown = false;                                 // 系统语言是否就在这四种里
+        for (String t : LANG_TAGS) {
+            if (t.equals(sysTag)) sysKnown = true;
         }
 
         LocaleListCompat now = AppCompatDelegate.getApplicationLocales();
-        String curTag = now.isEmpty() ? sysTag : supported(now.toLanguageTags());
+        // 没有覆盖时实际生效的就是系统语言；系统语言不支持，落到英文默认资源
+        String curTag = now.isEmpty() ? (sysKnown ? sysTag : "en") : supported(now.toLanguageTags());
 
         final java.util.List<String> labels = new java.util.ArrayList<>();
         final java.util.List<String> tags = new java.util.ArrayList<>();
-        if (sysIdx < 0) {
-            labels.add(getString(R.string.lang_system_of, langName(sysTag)));
-            tags.add(null);
-        }
         for (int i = 0; i < LANG_TAGS.length; i++) {
             labels.add(now.isEmpty() && LANG_TAGS[i].equals(sysTag)
                     ? getString(R.string.lang_system_of, getString(LANG_LABELS[i]))
@@ -159,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
                 .setSingleChoiceItems(labels.toArray(new String[0]), cur, (d, w) -> {
                     d.dismiss();
                     String g = tags.get(w);
-                    // 选中的就是系统语言 ⇒ 不钉死，清空覆盖
-                    AppCompatDelegate.setApplicationLocales(g == null || g.equals(sysTag)
+                    // 选中的就是系统语言 ⇒ 不钉死，清空覆盖；其余一律钉死
+                    AppCompatDelegate.setApplicationLocales(g.equals(sysTag)
                             ? LocaleListCompat.getEmptyLocaleList()
                             : LocaleListCompat.forLanguageTags(g));
                 })
@@ -169,7 +166,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 把任何语言标签归到 LANG_TAGS 里的一个；不认识的返回原标签（只用于显示名字）。
+     * 把任何语言标签归到 LANG_TAGS 里的一个；不认识的返回原标签（调用方据此判断
+     * 系统语言不在四种之内）。
      * zh-Hant 不带地区时按台湾处理 —— AOSP 给 zh-Hant 的默认地区就是 TW，
      * 资源侧 `values-b+zh+Hant` 也按台湾用字兜底，两边口径一致；zh-HK / zh-MO 才是香港。
      */
@@ -182,14 +180,6 @@ public class MainActivity extends AppCompatActivity {
             return (t.contains("-HK") || t.contains("-MO")) ? "zh-HK" : "zh-TW";
         }
         return "zh-CN";                                          // zh / zh-Hans / zh-SG…
-    }
-
-    private String langName(String tag) {
-        for (int i = 0; i < LANG_TAGS.length; i++) {
-            if (LANG_TAGS[i].equals(tag)) return getString(LANG_LABELS[i]);
-        }
-        Locale l = Locale.forLanguageTag(tag);
-        return l.getDisplayLanguage(l);
     }
 
     private boolean switchTo(@NonNull MenuItem item) {
