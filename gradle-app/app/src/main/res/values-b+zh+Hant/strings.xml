@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 繁體中文（未指定地區）。系統只報 zh-Hant 時用它兜底，否則會掉回 values-zh 的簡體；用字依台灣慣例（AOSP 對 zh-Hant 的預設地區即台灣）。鍵名必須與 ../values/strings.xml（英文預設）一一對應。 -->
+<resources>
+    <string name="app_name">Pen Battery</string>
+
+    <string name="nav_battery">電量</string>
+    <string name="nav_history">紀錄</string>
+    <string name="nav_about">關於</string>
+
+    <string name="pen_name">Dell PN7522W</string>
+    <string name="pen_connected">Dell PN7522W · 已連線</string>
+    <string name="pen_disconnected">Dell PN7522W · 未連線</string>
+
+    <string name="section_status">狀態</string>
+    <string name="section_overview">概覽</string>
+    <string name="section_detail">明細</string>
+    <string name="section_app">應用程式</string>
+    <string name="section_device">裝置</string>
+    <string name="section_source">資料來源</string>
+    <string name="section_notes">說明</string>
+
+    <string name="chip_level">電量</string>
+
+    <string name="today_reads">今日讀取次數</string>
+    <string name="recorded_days">紀錄天數</string>
+    <string name="no_record">無紀錄</string>
+
+    <string name="btn_export">匯出到…</string>
+    <string name="btn_clear">清除紀錄</string>
+    <string name="btn_copy_diag">複製診斷資訊</string>
+
+    <string name="col_date">日期</string>
+    <string name="col_level">電量</string>
+    <string name="col_last">最後一次</string>
+    <string name="col_count">次數</string>
+
+    <string name="spec_version">版本</string>
+    <string name="spec_installed">安裝時間</string>
+    <string name="spec_device">裝置名稱</string>
+    <string name="spec_mac">藍牙位址</string>
+    <string name="spec_chip">晶片廠商</string>
+    <string name="spec_service">電池服務</string>
+    <string name="spec_char">電量特徵</string>
+    <string name="spec_first">首筆紀錄</string>
+    <string name="spec_total">累計紀錄</string>
+
+    <string name="note_why">系統電量顯示</string>
+    <string name="note_why_body">平板的藍牙堆疊不會訂閱這支筆的 Battery Level 特徵，因此系統介面不顯示筆的電量。
+        本應用程式改以 GATT 直接訂閱。</string>
+    <string name="note_accuracy">數值準確度</string>
+    <string name="note_accuracy_body">電量由筆的韌體回報（0–100），應用程式原樣讀取。</string>
+
+    <string name="overview_summary">最近 %1$d 天有紀錄 %2$d 天</string>
+    <string name="overview_sampling_note">曲線只在應用程式開啟時取樣，缺口代表實際沒有資料的時段</string>
+    <string name="runtime_none">尚無本輪資料</string>
+    <string name="runtime_hint_none">讀到一次 100% 後開始計時</string>
+    <string name="runtime_done">本輪執行時間</string>
+    <string name="runtime_running">本輪已執行</string>
+    <string name="runtime_hint_done">%1$s → %2$s · 已進入低電量</string>
+    <string name="runtime_hint_running">起點 %1$s · 尚未進入低電量</string>
+
+    <string name="dlg_clear_title">清除全部紀錄？</string>
+    <string name="dlg_clear_body">將刪除所有歷史電量紀錄，且無法復原。</string>
+    <string name="dlg_clear_ok">清除</string>
+    <string name="dlg_cancel">取消</string>
+
+    <string name="msg_copied">診斷資訊已複製到剪貼簿</string>
+    <string name="msg_need_perm">需要藍牙權限才能讀取電量</string>
+    <string name="status_idle">尚未開始</string>
+    <string name="status_not_connected">未連線</string>
+    <string name="status_sleeping">未連線 · 請確認觸控筆正在使用中</string>
+    <string name="status_no_target">未連線裝置 · 點擊選擇</string>
+    <string name="status_unsupported">裝置不支援</string>
+    <string name="need_bt_first">請先開啟藍牙再選擇裝置</string>
+    <string name="status_no_bonded">系統中沒有已配對的藍牙裝置 · 請先在設定中配對</string>
+    <string name="action_pick">選擇裝置</string>
+    <string name="action_switch_target">切換連線裝置</string>
+    <string name="dlg_pick_title">選擇要讀取電量的裝置</string>
+
+    <string name="disabled_level">裝置不支援</string>
+    <string name="mask_no_target">未連線裝置</string>
+    <string name="link_bt_on">點我開啟藍牙</string>
+    <string name="link_switch_device">點我切換連線裝置</string>
+    <string name="status_bt_off">請開啟藍牙</string>
+    <string name="disabled_stats">讀數已凍結</string>
+    <string name="disabled_trend">已停止紀錄</string>
+    <string name="disabled_detail">明細已凍結</string>
+    <string name="disabled_source">此裝置未驗證</string>
+    <string name="last_update">最後更新</string>
+
+    <string name="foot_source">資料來源：BLE 電池服務 0x180F（0x2A19 電量）</string>
+
+    <string name="not_selected">未選擇</string>
+    <string name="none_yet">暫無</string>
+    <string name="version_unavailable">版本資訊無法取得</string>
+    <string name="count_times">%1$d 次</string>
+    <string name="cycle_sealed">第 %1$d 週期</string>
+    <string name="cycle_range">%1$s – %2$s</string>
+    <string name="cycle_toggle">展開或收合此週期</string>
+    <string name="caret_collapsed">▸</string>
+    <string name="caret_expanded">▾</string>
+    <string name="count_days">%1$d 天</string>
+    <string name="dur_dhm">%1$d 天 %2$d 小時 %3$d 分</string>
+    <string name="dur_hm">%1$d 小時 %2$d 分</string>
+    <string name="dur_m">%1$d 分</string>
+    <string name="current_suffix">（目前）</string>
+    <string name="diag_header">=== Pen Battery 診斷資訊 ===</string>
+    <string name="export_ok">已匯出到：%1$s</string>
+    <string name="export_fail_write">匯出失敗：無法寫入所選位置</string>
+    <string name="export_fail_err">匯出失敗：%1$s</string>
+    <string name="csv_header">日期,電量%,當天最後一次讀數時間,當天讀數次數</string>
+
+    <string name="gatt_no_adapter">本機沒有藍牙介面卡</string>
+    <string name="gatt_bt_off">藍牙未開啟</string>
+    <string name="gatt_no_perm">缺少藍牙權限</string>
+    <string name="gatt_bad_addr">裝置位址無效</string>
+    <string name="gatt_connecting">正在連線…</string>
+    <string name="gatt_stopped">已停止</string>
+    <string name="gatt_discovering">已連線，正在探索服務…</string>
+    <string name="gatt_disconnected">連線中斷（status=%1$d）</string>
+    <string name="gatt_no_service">找不到電池服務 0x180F</string>
+    <string name="gatt_no_char">找不到電量特徵 0x2A19</string>
+    <string name="gatt_subscribing">正在建立訂閱…</string>
+    <string name="gatt_ready">就緒</string>
+
+    <string name="src_read">讀取</string>
+    <string name="src_notify">通知</string>
+    <string name="src_pull">手動下拉重新整理</string>
+    <string name="src_poll">定期輪詢備援</string>
+    <string name="src_cccd_timeout">CCCD 逾時備援</string>
+    <string name="src_no_cccd">無 CCCD</string>
+    <string name="src_sub_done">訂閱完成</string>
+    <string name="src_step_guard">步進異常備援</string>
+
+    <string name="action_settings">設定</string>
+    <string name="dlg_lang_title">語言</string>
+    <string name="lang_system_of">跟隨系統（%1$s）</string>
+    <string name="lang_en">English</string>
+    <string name="lang_zh">简体中文</string>
+    <string name="lang_zh_tw">繁體中文（台灣）</string>
+    <string name="lang_zh_hk">繁體中文（香港）</string>
+    <string-array name="weekdays_short">
+        <item>週一</item><item>週二</item><item>週三</item><item>週四</item><item>週五</item><item>週六</item><item>週日</item>
+    </string-array>
+</resources>

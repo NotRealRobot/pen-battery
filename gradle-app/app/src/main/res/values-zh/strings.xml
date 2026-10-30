@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 中文。键名必须与 ../values/strings.xml（英文默认）一一对应。 -->
+<!-- 简体中文。键名必须与 ../values/strings.xml（英文默认）一一对应，繁体三份同理。 -->
 <resources>
     <string name="app_name">Pen Battery</string>
 
@@ -138,6 +138,8 @@
     <string name="lang_system_of">跟随系统（%1$s）</string>
     <string name="lang_en">English</string>
     <string name="lang_zh">简体中文</string>
+    <string name="lang_zh_tw">繁體中文（台灣）</string>
+    <string name="lang_zh_hk">繁體中文（香港）</string>
     <string-array name="weekdays_short">
         <item>周一</item><item>周二</item><item>周三</item><item>周四</item><item>周五</item><item>周六</item><item>周日</item>
     </string-array>

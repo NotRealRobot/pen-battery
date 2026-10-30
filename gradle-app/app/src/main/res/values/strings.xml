@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   默认语言 = 英文（AOSP 惯例：无限定符的资源是"其他语言"的兜底）。
-  中文在 ../values-zh/strings.xml，两边键名必须一一对应 —— 缺一个键，中文界面就会掉回英文。
+  中文资源四处：简体 ../values-zh/，繁体 ../values-zh-rTW/、../values-zh-rHK/、
+  以及只报 zh-Hant 时的兜底 ../values-b+zh+Hant/。五份键名必须一一对应 ——
+  缺一个键，该语言界面就会掉回英文。改完跑 python tools/check_strings.py。
   文案规矩：遮罩/提示一律"现状 + 下一步"，不写 error/failed 这类词；遮罩标签保持短。
 -->
 <resources>
@@ -146,6 +148,9 @@
     <string name="lang_system_of">System default (%1$s)</string>
     <string name="lang_en">English</string>
     <string name="lang_zh">简体中文</string>
+    <!-- 语言名一律用该语言自己的写法，四种界面语言里显示同一串字符 -->
+    <string name="lang_zh_tw">繁體中文（台灣）</string>
+    <string name="lang_zh_hk">繁體中文（香港）</string>
     <!-- 星期短名：索引 0=周一 … 6=周日（不用 java.time 的 TextStyle，设备 CLD 给什么不可控） -->
     <string-array name="weekdays_short">
         <item>Mon</item><item>Tue</item><item>Wed</item><item>Thu</item><item>Fri</item><item>Sat</item><item>Sun</item>
