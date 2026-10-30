@@ -113,34 +113,36 @@ public class MainActivity extends AppCompatActivity {
         requestPermsIfNeeded();
     }
 
+    /** 四种可选界面语言：tag 用 BCP 47，名字各用其本身的写法 */
+    private static final String[] LANG_TAGS = {"en", "zh-CN", "zh-TW", "zh-HK"};
+    private static final int[] LANG_LABELS = {
+            R.string.lang_en, R.string.lang_zh, R.string.lang_zh_tw, R.string.lang_zh_hk};
+
     /**
      * 设置 = 目前只有语言。选项按"与系统语言重合就合并"的规则生成：
-     * 系统中文 ⇒「跟随系统（简体中文）」+ English（不再单列简体中文）；
-     * 系统英文 ⇒「System default (English)」+ 简体中文；其他语言 ⇒ 三项都在。
-     * 括号里的语言名用该语言自己的写法。中文不能走 Locale.getDisplayLanguage —— 它只认
-     * language 字段（zh），脚本被丢掉，得到的永远是"中文"；lang_zh 在两个语种下都正好是
-     * "简体中文"，与下面那个选项的写法一致。
+     * 系统中文 ⇒「跟随系统（简体中文）」+ English + 两个繁体；系统英文 ⇒ 反过来；
+     * 系统是其他语言 ⇒ 四项都在。括号里的语言名用该语言自己的写法 —— 中文不能走
+     * Locale.getDisplayLanguage：它按 language 字段（zh）取，脚本与地区都被丢掉，
+     * 四种中文会显示成同一个"中文"。
      */
     private void showSettings() {
-        Locale sys = Resources.getSystem().getConfiguration().getLocales().get(0);
-        String sysTag = sys.getLanguage();
-        Locale shown = Locale.forLanguageTag(sysTag);
-        String sysName = "zh".equals(sysTag)
-                ? getString(R.string.lang_zh) : shown.getDisplayLanguage(shown);
+        String sysTag = supported(Resources.getSystem().getConfiguration()
+                .getLocales().get(0).toLanguageTag());
 
         final java.util.List<String> labels = new java.util.ArrayList<>();
         final java.util.List<String> tags = new java.util.ArrayList<>();
-        labels.add(getString(R.string.lang_system_of, sysName)); tags.add(null);
-        if (!"en".equals(sysTag)) { labels.add(getString(R.string.lang_en)); tags.add("en"); }
-        if (!"zh".equals(sysTag)) { labels.add(getString(R.string.lang_zh)); tags.add("zh"); }
+        labels.add(getString(R.string.lang_system_of, langName(sysTag))); tags.add(null);
+        for (int i = 0; i < LANG_TAGS.length; i++) {
+            if (LANG_TAGS[i].equals(sysTag)) continue;          // 与系统重合就不单列
+            labels.add(getString(LANG_LABELS[i])); tags.add(LANG_TAGS[i]);
+        }
 
         LocaleListCompat now = AppCompatDelegate.getApplicationLocales();
         int cur = 0;
         if (!now.isEmpty()) {
-            String t = now.toLanguageTags();
-            for (int i = 0; i < tags.size(); i++) {
-                String g = tags.get(i);
-                if (g != null && t.startsWith(g)) { cur = i; break; }
+            String t = supported(now.toLanguageTags());
+            for (int i = 1; i < tags.size(); i++) {             // 0 号永远是"跟随系统"
+                if (t.equals(tags.get(i))) { cur = i; break; }
             }
         }
 
@@ -155,6 +157,30 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(R.string.dlg_cancel, null)
                 .show();
+    }
+
+    /**
+     * 把任何语言标签归到 LANG_TAGS 里的一个；不认识的返回原标签（只用于显示名字）。
+     * zh-Hant 不带地区时按台湾处理 —— AOSP 给 zh-Hant 的默认地区就是 TW，
+     * 资源侧 `values-b+zh+Hant` 也按台湾用字兜底，两边口径一致；zh-HK / zh-MO 才是香港。
+     */
+    private static String supported(String tag) {
+        if (tag == null || tag.isEmpty()) return "en";
+        String t = tag.replace('_', '-');
+        if (t.equals("en") || t.startsWith("en-")) return "en";
+        if (!(t.equals("zh") || t.startsWith("zh-"))) return t;
+        if (t.contains("Hant") || t.contains("-TW") || t.contains("-HK") || t.contains("-MO")) {
+            return (t.contains("-HK") || t.contains("-MO")) ? "zh-HK" : "zh-TW";
+        }
+        return "zh-CN";                                          // zh / zh-Hans / zh-SG…
+    }
+
+    private String langName(String tag) {
+        for (int i = 0; i < LANG_TAGS.length; i++) {
+            if (LANG_TAGS[i].equals(tag)) return getString(LANG_LABELS[i]);
+        }
+        Locale l = Locale.forLanguageTag(tag);
+        return l.getDisplayLanguage(l);
     }
 
     private boolean switchTo(@NonNull MenuItem item) {
