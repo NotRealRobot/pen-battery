@@ -57,7 +57,7 @@ directly over GATT and records the readings locally.
 ## ⬇️ Installation
 
 Install the prebuilt package from this repository's **Releases** page: the asset `app-release.apk`
-attached to the newest tag (currently `v2.7.7`, versionCode 72). It is signed with the project's
+attached to the newest tag (currently `v2.8.5`, versionCode 78). It is signed with the project's
 release key — signing certificate SHA-1 `4374fe36ebc1326bc9be2e338ecfaae675e6de3a` — and later
 releases use the same key, so updating in place keeps the recorded history.
 
