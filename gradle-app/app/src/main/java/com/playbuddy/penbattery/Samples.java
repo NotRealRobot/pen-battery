@@ -25,11 +25,15 @@ public final class Samples {
         Point(long ts, int pct) { this.ts = ts; this.pct = pct; }
     }
 
-    /** 一个放电周期：startTs = 最近一次读到 100% 的时刻；endTs = 其后第一次读到 ≤10% 的时刻（未到则 -1） */
+    /** 一个放电周期：startTs = 最近一次读到 100% 的时刻；endTs = 其后第一次读到 ≤10% 或手动收尾的时刻（未到则 -1） */
     public static final class Cycle {
         public final long startTs;
         public final long endTs;
-        Cycle(long startTs, long endTs) { this.startTs = startTs; this.endTs = endTs; }
+        /** 终点是用户手动收尾，而不是读到 ≤10% */
+        public final boolean manual;
+        Cycle(long startTs, long endTs, boolean manual) {
+            this.startTs = startTs; this.endTs = endTs; this.manual = manual;
+        }
     }
 
     /** 一个已封存（走完）的周期：idx 是它在库里的序号，也就是界面上的「第 n 周期」。 */
@@ -37,7 +41,10 @@ public final class Samples {
         public final int idx;
         public final long startTs;
         public final long endTs;
-        Sealed(int idx, long startTs, long endTs) { this.idx = idx; this.startTs = startTs; this.endTs = endTs; }
+        public final boolean manual;
+        Sealed(int idx, long startTs, long endTs, boolean manual) {
+            this.idx = idx; this.startTs = startTs; this.endTs = endTs; this.manual = manual;
+        }
     }
 
     private static final int FULL_PCT = 100;
@@ -48,17 +55,22 @@ public final class Samples {
     private static final int MAX_POINTS = 20_000;
 
     private static final class Db extends SQLiteOpenHelper {
-        Db(Context c) { super(c, "pen_battery_samples.db", null, 2); }
+        Db(Context c) { super(c, "pen_battery_samples.db", null, 3); }
         @Override public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE samples (ts INTEGER PRIMARY KEY, pct INTEGER NOT NULL)");
             createCycles(db);
         }
         /**
-         * v1 → v2 只加 cycles 表。**不能沿用旧的 DROP + onCreate**：那会把用户跑出来的
+         * v1 → v2 只加 cycles 表；v2 → v3 给 cycles 补 manual 列（老库里封存的都是读到 ≤10% 的周期）。
+         * **不能沿用旧的 DROP + onCreate**：那会把用户跑出来的
          * 时间序列整表清掉，而周期封存的起点恰恰只存在于这份序列里。
          */
         @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion < 2) createCycles(db);
+            if (oldVersion < 2) {
+                createCycles(db);          // 新建的表已经带 manual 列
+            } else if (oldVersion < 3) {
+                db.execSQL("ALTER TABLE cycles ADD COLUMN manual INTEGER NOT NULL DEFAULT 0");
+            }
         }
     }
 
@@ -72,7 +84,8 @@ public final class Samples {
         db.execSQL("CREATE TABLE IF NOT EXISTS cycles ("
                 + "idx INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "start_ts INTEGER UNIQUE NOT NULL, "
-                + "end_ts INTEGER NOT NULL)");
+                + "end_ts INTEGER NOT NULL, "
+                + "manual INTEGER NOT NULL DEFAULT 0)");
     }
 
     private static Db db(Context c) { return new Db(c.getApplicationContext()); }
@@ -130,7 +143,35 @@ public final class Samples {
             if (p.pct >= FULL_PCT) { start = p.ts; end = -1; }      // 新的 100% ⇒ 开新一轮
             else if (start > 0 && end < 0 && p.pct <= LOW_PCT) end = p.ts;
         }
-        return new Cycle(start, end);
+        // 封存表优先：同一轮已经封过就以封存终点为准。手动收尾的那次是「现在」，
+        // 不能因为之后又读到 ≤10% 就被改写成更晚的终点。
+        boolean manual = false;
+        long lastEnd = -1;
+        for (Sealed s : sealed(c)) {
+            if (s.startTs == start) { end = s.endTs; manual = s.manual; }
+            if (s.endTs > lastEnd) lastEnd = s.endTs;
+        }
+        // 起点已被更晚的封存盖住 ⇒ 这一轮不在了：手动收尾后、下一次读到 100% 之前就是这种状态
+        if (end < 0 && start > 0 && start <= lastEnd) start = -1;
+        return new Cycle(start, end, manual);
+    }
+
+    /**
+     * 手动结束当前周期：把「最近一次 100% → 现在」封存成已完成的周期（manual = 1）。
+     * 用于电量还没到 10% 就要去充电的情况；下一次读到 100% 会自然开新一轮。
+     * 返回 true 表示新写入了一笔；没有进行中的周期、或同一轮已经封过时返回 false。
+     */
+    public static boolean endNow(Context c, int days) {
+        Cycle cy = cycle(c, days, History.lastFullTs(c));
+        if (cy.startTs <= 0 || cy.endTs > 0) return false;
+        try (Db d = db(c); SQLiteDatabase w = d.getWritableDatabase()) {
+            ContentValues cv = new ContentValues();
+            cv.put("start_ts", cy.startTs);
+            cv.put("end_ts", System.currentTimeMillis());
+            cv.put("manual", 1);
+            // start_ts 唯一 ⇒ 与自动封存、或重复点按天然去重
+            return w.insertWithOnConflict("cycles", null, cv, SQLiteDatabase.CONFLICT_IGNORE) > 0;
+        }
     }
 
     /**
@@ -190,8 +231,10 @@ public final class Samples {
     public static List<Sealed> sealed(Context c) {
         List<Sealed> out = new ArrayList<>();
         try (Db d = db(c); SQLiteDatabase r = d.getReadableDatabase();
-             Cursor cur = r.rawQuery("SELECT idx, start_ts, end_ts FROM cycles ORDER BY idx ASC", null)) {
-            while (cur.moveToNext()) out.add(new Sealed(cur.getInt(0), cur.getLong(1), cur.getLong(2)));
+             Cursor cur = r.rawQuery("SELECT idx, start_ts, end_ts, manual FROM cycles ORDER BY idx ASC", null)) {
+            while (cur.moveToNext()) {
+                out.add(new Sealed(cur.getInt(0), cur.getLong(1), cur.getLong(2), cur.getInt(3) != 0));
+            }
         }
         return out;
     }

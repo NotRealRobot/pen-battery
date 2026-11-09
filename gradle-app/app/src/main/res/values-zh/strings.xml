@@ -58,10 +58,15 @@
     <string name="runtime_running">本轮已运行</string>
     <string name="runtime_hint_done">%1$s → %2$s · 已进入低电量</string>
     <string name="runtime_hint_running">起点 %1$s · 尚未进入低电量</string>
+    <string name="runtime_hint_done_manual">%1$s → %2$s · 手动结束</string>
+    <string name="link_end_cycle">结束本轮</string>
 
     <string name="dlg_clear_title">清空全部记录？</string>
     <string name="dlg_clear_body">将删除所有历史电量记录，且不可恢复。</string>
     <string name="dlg_clear_ok">清空</string>
+    <string name="dlg_end_title">结束本轮？</string>
+    <string name="dlg_end_body">本轮现在就结束，并保留在记录里；下一次读到 100% 时开始新的一轮。</string>
+    <string name="dlg_end_ok">结束</string>
     <string name="dlg_cancel">取消</string>
 
     <string name="msg_copied">诊断信息已复制到剪贴板</string>
@@ -96,6 +101,7 @@
     <!-- 明细里已走完的周期会被折叠封存：标题 = 第 n 周期 + 起止时刻 -->
     <string name="cycle_sealed">第 %1$d 周期</string>
     <string name="cycle_range">%1$s – %2$s</string>
+    <string name="cycle_range_manual">%1$s – %2$s · 手动结束</string>
     <string name="cycle_toggle">展开或收起该周期</string>
     <string name="caret_collapsed">▸</string>
     <string name="caret_expanded">▾</string>

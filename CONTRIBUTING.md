@@ -75,7 +75,7 @@ authority should not travel with them.
 | `PenTarget` | resolve the target device at runtime (remembered → keyword → ask); report whether it is a verified model |
 | `PenGatt` | GATT client: `0x180F` → `0x2A19`, subscribe, 60 s poll fallback, reconnect with backoff |
 | `State` | one immutable snapshot per refresh; `shouldMask()` is the single place that decides what counts as unsupported |
-| `History`, `Samples` | day-by-day persistence and the timestamped sample series; charge-cycle endpoints and sealed cycles are derived from them |
+| `History`, `Samples` | day-by-day persistence and the timestamped sample series; charge-cycle endpoints and sealed cycles are derived from them. An early manual end is stored as a sealed cycle with a `manual` flag |
 | `BatteryFragment`, `HistoryFragment`, `AboutFragment` | the three tabs |
 | `Disabled` | the "not supported" overlay panel (translucent fill + hatch + short label) |
 | `Links` | word-level clickable spans, with hit testing that follows the marked word's actual line bounds |

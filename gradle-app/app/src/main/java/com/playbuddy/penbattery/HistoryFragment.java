@@ -322,6 +322,7 @@ public class HistoryFragment extends Fragment {
     private final android.os.Handler tickHandler =
             new android.os.Handler(android.os.Looper.getMainLooper());
     private long cyStart, cyEnd;              // 本轮端点；cyEnd <= 0 ⇒ 还没结束
+    private boolean cyManual;                 // 终点是手动收尾（而不是读到 ≤10%）
     private long lastDbMs;                    // 上次真正查库的时刻
 
     private final Runnable ticker = new Runnable() {
@@ -377,6 +378,7 @@ public class HistoryFragment extends Fragment {
     private void showRuntime(Samples.Cycle cy) {
         cyStart = cy.startTs;
         cyEnd = cy.endTs;
+        cyManual = cy.manual;
         renderRuntime();
     }
 
@@ -384,17 +386,41 @@ public class HistoryFragment extends Fragment {
     private void renderRuntime() {
         if (cyStart <= 0) {
             runtime.setText(R.string.runtime_none);
-            runtimeHint.setText(R.string.runtime_hint_none);
+            Links.plain(runtimeHint, getString(R.string.runtime_hint_none));
             return;
         }
         boolean done = cyEnd > 0;
         long endMs = done ? cyEnd : System.currentTimeMillis();   // 没结束 ⇒ 就是"现在减起点"（项目约定）
         runtime.setText(getString(done ? R.string.runtime_done : R.string.runtime_running)
                 + " " + humanDuration(endMs - cyStart));
-        runtimeHint.setText(done
-                ? getString(R.string.runtime_hint_done, TS_FMT.format(ts(cyStart)),
-                                                TS_FMT.format(ts(cyEnd)))
-                : getString(R.string.runtime_hint_running, TS_FMT.format(ts(cyStart))));
+        String started = TS_FMT.format(ts(cyStart));
+        if (done) {
+            Links.plain(runtimeHint, getString(cyManual ? R.string.runtime_hint_done_manual
+                                                        : R.string.runtime_hint_done,
+                    started, TS_FMT.format(ts(cyEnd))));
+        } else if (State.shouldMask()) {
+            // 遮罩下不挂可点词：设备不是验证型号时，"结束本轮"没有意义
+            Links.plain(runtimeHint, getString(R.string.runtime_hint_running, started));
+        } else {
+            Links.bind(runtimeHint, getString(R.string.runtime_hint_running, started),
+                    getString(R.string.link_end_cycle), Links.INLINE, this::confirmEndCycle);
+        }
+    }
+
+    /** 电量没到 10% 但要去充电时，可以提前把本轮封存；下一次读到 100% 自然开新一轮 */
+    private void confirmEndCycle() {
+        if (cyStart <= 0 || cyEnd > 0 || State.shouldMask()) return;
+        android.content.Context c = getContext();
+        if (c == null) return;
+        new MaterialAlertDialogBuilder(c)
+                .setTitle(R.string.dlg_end_title)
+                .setMessage(R.string.dlg_end_body)
+                .setNegativeButton(R.string.dlg_cancel, null)
+                .setPositiveButton(R.string.dlg_end_ok, (d, w) -> {
+                    Samples.endNow(c, DAYS);
+                    refresh();
+                })
+                .show();
     }
 
     private static java.time.LocalDateTime ts(long ms) {
@@ -466,8 +492,9 @@ public class HistoryFragment extends Fragment {
                 HeadHolder hh = (HeadHolder) h;
                 android.content.Context ctx = hh.itemView.getContext();
                 hh.title.setText(ctx.getString(R.string.cycle_sealed, r.head.idx));
-                hh.range.setText(ctx.getString(R.string.cycle_range,
-                        TS_FMT.format(ts(r.head.startTs)), TS_FMT.format(ts(r.head.endTs))));
+                String a = TS_FMT.format(ts(r.head.startTs)), b = TS_FMT.format(ts(r.head.endTs));
+                hh.range.setText(ctx.getString(r.head.manual ? R.string.cycle_range_manual
+                                                             : R.string.cycle_range, a, b));
                 hh.caret.setText(ctx.getString(r.opened ? R.string.caret_expanded : R.string.caret_collapsed));
                 hh.itemView.setContentDescription(ctx.getString(R.string.cycle_toggle));
                 hh.itemView.setOnClickListener(v -> { if (toggle != null) toggle.accept(r.head); });

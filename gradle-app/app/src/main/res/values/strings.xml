@@ -65,10 +65,15 @@
     <string name="runtime_running">Running for</string>
     <string name="runtime_hint_done">%1$s → %2$s · reached low battery</string>
     <string name="runtime_hint_running">Started %1$s · low battery not reached</string>
+    <string name="runtime_hint_done_manual">%1$s → %2$s · ended manually</string>
+    <string name="link_end_cycle">End this cycle</string>
 
     <string name="dlg_clear_title">Delete all records?</string>
     <string name="dlg_clear_body">This removes every stored battery record and can\'t be undone.</string>
     <string name="dlg_clear_ok">Delete</string>
+    <string name="dlg_end_title">End this cycle?</string>
+    <string name="dlg_end_body">The cycle ends now and stays in History. The next 100% reading starts a new one.</string>
+    <string name="dlg_end_ok">End</string>
     <string name="dlg_cancel">Cancel</string>
 
     <string name="msg_copied">Diagnostics copied to clipboard</string>
@@ -105,6 +110,7 @@
     <!-- 明细里已走完的周期会被折叠封存：标题 = 第 n 周期 + 起止时刻 -->
     <string name="cycle_sealed">Cycle %1$d</string>
     <string name="cycle_range">%1$s – %2$s</string>
+    <string name="cycle_range_manual">%1$s – %2$s · ended manually</string>
     <string name="cycle_toggle">Expand or collapse this cycle</string>
     <string name="caret_collapsed">▸</string>
     <string name="caret_expanded">▾</string>
