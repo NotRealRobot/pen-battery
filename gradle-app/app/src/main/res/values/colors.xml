@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  MD3 品牌色板 · 方案 C「青柠绿」（用户选定）。
-  ★ 只定义 primary / secondary / tertiary / error 四组品牌色；
-    中性色（surface / onSurface / outline / surfaceContainer …）用 Theme.Material3 默认实现，
-    这样深浅层级与官方一致，不会被我改乱（否则 surface 与 surfaceContainer 的层级会错）。
+  MD3 品牌色板 · 方案 A「青柠气泡」（2026-11-09 用户选定）。
+  ★ 只定义品牌色与中性色两组令牌：品牌色管按钮/链接/图表，中性色带一点黄绿倾向，
+    这样浅色底不再是一片纯白灰、深色底不再接近纯黑（2.8.6 及以前直接用 M3 默认中性色）。
+  ★ 中性色的层级仍按 M3 的 tone 顺序（surface 98 / containerLow 96 / container 94 /
+    containerHigh 92 / containerHighest 90），只改色相，不动层级关系。
 -->
 <resources>
-    <!-- primary：草绿 -->
-    <color name="md_theme_primary">#FF3E7D00</color>
+    <!-- primary：青柠绿（浅色侧压到 tone 40 附近：白字/链接在 #F3F8E6 上仍 ≥4.5:1；
+         更亮的青柠放在 primaryContainer 与底栏选中胶囊上） -->
+    <color name="md_theme_primary">#FF427F00</color>
     <color name="md_theme_onPrimary">#FFFFFFFF</color>
-    <color name="md_theme_primaryContainer">#FFB4F53C</color>
-    <color name="md_theme_onPrimaryContainer">#FF0F2000</color>
+    <color name="md_theme_primaryContainer">#FFC7F45F</color>
+    <color name="md_theme_onPrimaryContainer">#FF152800</color>
 
-    <!-- secondary：橄榄绿 -->
-    <color name="md_theme_secondary">#FF5C6040</color>
+    <!-- secondary：嫩橄榄（secondaryContainer 同时是底栏选中胶囊的底色） -->
+    <color name="md_theme_secondary">#FF5B6E33</color>
     <color name="md_theme_onSecondary">#FFFFFFFF</color>
-    <color name="md_theme_secondaryContainer">#FFE0E5C0</color>
-    <color name="md_theme_onSecondaryContainer">#FF191D05</color>
+    <color name="md_theme_secondaryContainer">#FFD7F98F</color>
+    <color name="md_theme_onSecondaryContainer">#FF1B2A00</color>
 
     <!-- tertiary：青（与图标/笔的青色呼应） -->
-    <color name="md_theme_tertiary">#FF00696B</color>
+    <color name="md_theme_tertiary">#FF00979B</color>
     <color name="md_theme_onTertiary">#FFFFFFFF</color>
-    <color name="md_theme_tertiaryContainer">#FF8CF3F1</color>
-    <color name="md_theme_onTertiaryContainer">#FF001F1F</color>
+    <color name="md_theme_tertiaryContainer">#FFA2F2F0</color>
+    <color name="md_theme_onTertiaryContainer">#FF002020</color>
 
     <!-- error：M3 标准红 -->
     <color name="md_theme_error">#FFBA1A1A</color>
@@ -30,8 +32,26 @@
     <color name="md_theme_errorContainer">#FFFFDAD6</color>
     <color name="md_theme_onErrorContainer">#FF410002</color>
 
+    <!-- 中性色：带黄绿倾向的白（surface 与各 container 只差几个 tone） -->
+    <color name="md_theme_surface">#FFFBFDF3</color>
+    <color name="md_theme_surfaceDim">#FFD9DEC9</color>
+    <color name="md_theme_surfaceBright">#FFFBFDF3</color>
+    <color name="md_theme_onSurface">#FF1A1C14</color>
+    <color name="md_theme_surfaceVariant">#FFE1E5D4</color>
+    <color name="md_theme_onSurfaceVariant">#FF44483A</color>
+    <color name="md_theme_surfaceContainerLowest">#FFFFFFFF</color>
+    <color name="md_theme_surfaceContainerLow">#FFF3F8E6</color>
+    <color name="md_theme_surfaceContainer">#FFEDF4DE</color>
+    <color name="md_theme_surfaceContainerHigh">#FFE7EFD8</color>
+    <color name="md_theme_surfaceContainerHighest">#FFE1EACC</color>
+    <color name="md_theme_outline">#FF74796A</color>
+    <color name="md_theme_outlineVariant">#FFC4C9B8</color>
+    <color name="md_theme_surfaceInverse">#FF2F3228</color>
+    <color name="md_theme_onSurfaceInverse">#FFF0F2E4</color>
+    <color name="md_theme_primaryInverse">#FFB7F26A</color>
+
     <!-- 悬浮底栏：半透明（首次绘制 / 模糊兜底时用；83% ⇒ 仍能透出一点内容） -->
-    <color name="nav_floating_bg">#CCF4F8E8</color>
+    <color name="nav_floating_bg">#CCE9F6D2</color>
 
     <!-- 毛玻璃蒙版：盖在模糊底图之上，alpha 越低越通透。
          6% ⇒ 几乎只剩"提亮一层"，通透度交给模糊本身去做。 -->
@@ -41,13 +61,13 @@
     <color name="nav_glass_border">#21000000</color>
 
     <!-- 电量渐变（底板用）：5 档标定，按 0/15/35/60/100 分段线性插值。
-         设计意图：高电量走**低饱和橄榄绿**（不抢 primary 的鲜艳草绿），
+         设计意图：高电量走**亮青柠绿**（有生气但不刺眼），
          只有真的接近见底才逐步走向鲜艳的红 —— 警示色要"晚到"才有效。 -->
-    <color name="battery_crit">#FFBA1A1A</color>
-    <color name="battery_low">#FFA8552F</color>
-    <color name="battery_fair">#FF8F7A2E</color>
-    <color name="battery_ok">#FF6F7A3E</color>
-    <color name="battery_full">#FF5C6040</color>
+    <color name="battery_crit">#FFD93F3F</color>
+    <color name="battery_low">#FFE3803B</color>
+    <color name="battery_fair">#FFD9BC3B</color>
+    <color name="battery_ok">#FF8FCB3C</color>
+    <color name="battery_full">#FF5FB000</color>
 
     <!-- 下拉刷新时的页面蒙版（MD3 对话框同款 32% 黑） -->
     <color name="refresh_scrim">#52000000</color>

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- MD3 品牌色板（深色）· 方案 C「青柠绿」。与 values/colors.xml 同名，DayNight 自动挑选。 -->
+<!-- MD3 品牌色板（深色）· 方案 A「青柠气泡」。与 values/colors.xml 同名，DayNight 自动挑选。
+     深色底不再是纯黑：surface 用墨绿近黑，container 逐级抬亮，电量越高底色越偏青柠。 -->
 <resources>
-    <color name="md_theme_primary">#FFA8E63A</color>
+    <color name="md_theme_primary">#FFB7F26A</color>
     <color name="md_theme_onPrimary">#FF1B3300</color>
-    <color name="md_theme_primaryContainer">#FF335100</color>
-    <color name="md_theme_onPrimaryContainer">#FFCBF768</color>
+    <color name="md_theme_primaryContainer">#FF386300</color>
+    <color name="md_theme_onPrimaryContainer">#FFD6FF9C</color>
 
-    <color name="md_theme_secondary">#FFC3C99B</color>
-    <color name="md_theme_onSecondary">#FF2B2F1B</color>
-    <color name="md_theme_secondaryContainer">#FF414629</color>
-    <color name="md_theme_onSecondaryContainer">#FFDFE5B6</color>
+    <color name="md_theme_secondary">#FFC3D19A</color>
+    <color name="md_theme_onSecondary">#FF2B3317</color>
+    <color name="md_theme_secondaryContainer">#FF3F4F1F</color>
+    <color name="md_theme_onSecondaryContainer">#FFD7F98F</color>
 
-    <color name="md_theme_tertiary">#FF7AD9DC</color>
-    <color name="md_theme_onTertiary">#FF003739</color>
-    <color name="md_theme_tertiaryContainer">#FF004F52</color>
+    <color name="md_theme_tertiary">#FF5BD9DD</color>
+    <color name="md_theme_onTertiary">#FF003738</color>
+    <color name="md_theme_tertiaryContainer">#FF004F51</color>
     <color name="md_theme_onTertiaryContainer">#FF9CF1F3</color>
 
     <color name="md_theme_error">#FFFFB4AB</color>
@@ -21,20 +22,37 @@
     <color name="md_theme_errorContainer">#FF93000A</color>
     <color name="md_theme_onErrorContainer">#FFFFDAD6</color>
 
-    <color name="nav_floating_bg">#CC1E2418</color>
+    <color name="md_theme_surface">#FF10140C</color>
+    <color name="md_theme_surfaceDim">#FF10140C</color>
+    <color name="md_theme_surfaceBright">#FF363F2A</color>
+    <color name="md_theme_onSurface">#FFE4E7D8</color>
+    <color name="md_theme_surfaceVariant">#FF44483A</color>
+    <color name="md_theme_onSurfaceVariant">#FFC4C9B8</color>
+    <color name="md_theme_surfaceContainerLowest">#FF0B0F08</color>
+    <color name="md_theme_surfaceContainerLow">#FF1A2014</color>
+    <color name="md_theme_surfaceContainer">#FF222A1A</color>
+    <color name="md_theme_surfaceContainerHigh">#FF2A331F</color>
+    <color name="md_theme_surfaceContainerHighest">#FF333D27</color>
+    <color name="md_theme_outline">#FF8E9483</color>
+    <color name="md_theme_outlineVariant">#FF44483A</color>
+    <color name="md_theme_surfaceInverse">#FFE4E7D8</color>
+    <color name="md_theme_onSurfaceInverse">#FF2F3228</color>
+    <color name="md_theme_primaryInverse">#FF427F00</color>
+
+    <color name="nav_floating_bg">#CC232A1B</color>
 
     <!-- 毛玻璃蒙版（深色）：alpha 5%，与浅色侧同样走"薄蒙版" -->
-    <color name="nav_glass_scrim">#0D14180F</color>
+    <color name="nav_glass_scrim">#0D1A2014</color>
 
     <!-- 胶囊描边（深色） -->
     <color name="nav_glass_border">#2BFFFFFF</color>
 
     <!-- 电量渐变（深色）：同样 5 档，整体提亮保证压在深色底板上仍看得出层次 -->
     <color name="battery_crit">#FFFFB4AB</color>
-    <color name="battery_low">#FFE8A98F</color>
-    <color name="battery_fair">#FFD8BE86</color>
-    <color name="battery_ok">#FFB9C08E</color>
-    <color name="battery_full">#FFC3C99B</color>
+    <color name="battery_low">#FFFFB68A</color>
+    <color name="battery_fair">#FFF2D06B</color>
+    <color name="battery_ok">#FFB5E06A</color>
+    <color name="battery_full">#FF8FE04A</color>
 
     <color name="refresh_scrim">#52000000</color>
 
