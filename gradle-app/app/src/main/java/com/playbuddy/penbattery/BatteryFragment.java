@@ -178,7 +178,7 @@ public class BatteryFragment extends Fragment implements State.Listener {
 
     /**
      * 底板随电量渐变：5 档标定（0 / 15 / 35 / 60 / 100）分段线性插值。
-     * 高电量用低饱和橄榄绿，接近见底才逐步走向鲜艳的红 —— 警示色晚到才有效。
+     * 高电量用带黄的青柠绿，接近见底才逐步走向鲜艳的红 —— 警示色晚到才有效。
      * 叠色浓度随电量下降而加深（8% → 22%），只在数值变化时重设。
      */
     private void tintCard() {
