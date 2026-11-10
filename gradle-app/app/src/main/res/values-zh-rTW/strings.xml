@@ -53,13 +53,14 @@
     <string name="overview_summary">最近 %1$d 天有紀錄 %2$d 天</string>
     <string name="overview_sampling_note">曲線只在應用程式開啟時取樣，缺口代表實際沒有資料的時段</string>
     <string name="runtime_none">尚無本輪資料</string>
-    <string name="runtime_hint_none">讀到一次 100% 後開始計時</string>
+    <string name="runtime_hint_none">讀到 100% 或手動開始後計時</string>
     <string name="runtime_done">本輪執行時間</string>
     <string name="runtime_running">本輪已執行</string>
     <string name="runtime_hint_done">%1$s → %2$s · 已進入低電量</string>
     <string name="runtime_hint_running">起點 %1$s · 尚未進入低電量</string>
     <string name="runtime_hint_done_manual">%1$s → %2$s · 手動結束</string>
     <string name="link_end_cycle">結束本輪</string>
+    <string name="link_start_cycle">開始新一輪</string>
 
     <string name="dlg_clear_title">清除全部紀錄？</string>
     <string name="dlg_clear_body">將刪除所有歷史電量紀錄，且無法復原。</string>
@@ -67,6 +68,9 @@
     <string name="dlg_end_title">結束本輪？</string>
     <string name="dlg_end_body">本輪現在就結束，並保留在紀錄裡；下一次讀到 100% 時開始新的一輪。</string>
     <string name="dlg_end_ok">結束</string>
+    <string name="dlg_start_title">開始新一輪？</string>
+    <string name="dlg_start_body">從現在起計時，直到讀到 ≤10%、讀到 100% 或手動結束。</string>
+    <string name="dlg_start_ok">開始</string>
     <string name="dlg_cancel">取消</string>
 
     <string name="msg_copied">診斷資訊已複製到剪貼簿</string>

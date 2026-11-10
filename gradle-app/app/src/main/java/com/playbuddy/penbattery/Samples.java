@@ -25,7 +25,10 @@ public final class Samples {
         Point(long ts, int pct) { this.ts = ts; this.pct = pct; }
     }
 
-    /** 一个放电周期：startTs = 最近一次读到 100% 的时刻；endTs = 其后第一次读到 ≤10% 或手动收尾的时刻（未到则 -1） */
+    /**
+     * 一个放电周期：startTs = 最近一次读到 100% 的时刻，或用户手动开始新一轮的时刻；
+     * endTs = 其后第一次读到 ≤10%、读到 100%（充满即另起一轮）或手动收尾的时刻（未到则 -1）
+     */
     public static final class Cycle {
         public final long startTs;
         public final long endTs;
@@ -79,6 +82,9 @@ public final class Samples {
      *   ① samples 按条数截断（MAX_POINTS），老周期的端点会消失，「第 n 周期」就不能再靠现推得到；
      *   ② 序号要稳定 —— 现推的话最早一轮一旦掉出窗口，后面每一轮的编号都会往前挪。
      * start_ts 唯一 ⇒ 回填可以反复跑而不会插重复。
+     *
+     * 手动开始的新一轮也落在这里，用 **end_ts = 0** 表示还没收尾（已封存的行一律 end_ts &gt; 0）。
+     * 这样不用加列、不用升库版本，序号（idx）也在开始那一刻就定下来。
      */
     private static void createCycles(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS cycles ("
@@ -105,6 +111,9 @@ public final class Samples {
             cv.put("ts", now);
             cv.put("pct", pct);
             w.insert("samples", null, cv);
+
+            // 读回 100% ⇒ 充满就是新周期的起点：手动开始的那一轮到此收尾（终点 = 这次满电的时刻）
+            if (pct >= FULL_PCT) closeOpen(w, now);
 
             // 读到 ≤10% ⇒ 这一轮已经在终点上：当场归档，别等下次打开记录页。
             // 拖到那时再算，终点还可能被按天表当天的"充回 100%"顶掉（用户 10-26 的实际数据就是这种日子）。
@@ -143,16 +152,32 @@ public final class Samples {
             if (p.pct >= FULL_PCT) { start = p.ts; end = -1; }      // 新的 100% ⇒ 开新一轮
             else if (start > 0 && end < 0 && p.pct <= LOW_PCT) end = p.ts;
         }
-        // 封存表优先：同一轮已经封过就以封存终点为准。手动收尾的那次是「现在」，
-        // 不能因为之后又读到 ≤10% 就被改写成更晚的终点。
-        boolean manual = false;
-        long lastEnd = -1;
+        // 手动开始 / 手动结束的一轮可能比样本里最后一次 100% 更晚：取起点最新的那一轮当「本轮 / 上一轮」。
+        // 否则手动那轮封存后，概览卡会退回去显示更早的自动轮。
+        long sealedStart = -1, sealedEnd = -1, lastEnd = -1;
+        boolean sealedManual = false;
         for (Sealed s : sealed(c)) {
-            if (s.startTs == start) { end = s.endTs; manual = s.manual; }
             if (s.endTs > lastEnd) lastEnd = s.endTs;
+            if (s.startTs > sealedStart) {
+                sealedStart = s.startTs;
+                sealedEnd = s.endTs;
+                sealedManual = s.manual;
+            }
         }
-        // 起点已被更晚的封存盖住 ⇒ 这一轮不在了：手动收尾后、下一次读到 100% 之前就是这种状态
-        if (end < 0 && start > 0 && start <= lastEnd) start = -1;
+        long open = openStart(c);
+        if (sealedStart > start) start = sealedStart;
+        if (open > start) start = open;
+        boolean manual = false;
+        if (start > 0 && start == sealedStart) {
+            // 封存表优先：同一轮已经封过就以封存终点为准（手动收尾后不会再被后来的 ≤10% 改写）
+            end = sealedEnd;
+            manual = sealedManual;
+        } else if (start > 0 && start == open) {
+            end = -1;                       // 手动开始、还在计时
+        }
+        // 起点已被更晚的封存盖住 ⇒ 这一轮不在了。
+        // 用严格小于：手动开始的一轮若在 100% 那一刻收尾，上一轮的终点与本轮起点相等，不能把本轮判掉。
+        if (end < 0 && start > 0 && start < lastEnd) start = -1;
         return new Cycle(start, end, manual);
     }
 
@@ -165,11 +190,24 @@ public final class Samples {
         Cycle cy = cycle(c, days, History.lastFullTs(c));
         if (cy.startTs <= 0 || cy.endTs > 0) return false;
         try (Db d = db(c); SQLiteDatabase w = d.getWritableDatabase()) {
+            // 手动开始的那一轮在表里已有一行（end_ts = 0）⇒ 收尾是更新它，不是再插一行
+            return sealRow(w, cy.startTs, System.currentTimeMillis(), true);
+        }
+    }
+
+    /**
+     * 手动开始新一轮：上一轮结束后，笔只充了一部分就拿来用，不必等下一次读到 100%。
+     * 起点 = 现在；之后照常按「≤10%、读到 100% 或手动结束」收尾。
+     * 返回 true 表示真的开了一轮；已有本轮在计时时返回 false。
+     */
+    public static boolean startNow(Context c, int days) {
+        Cycle cy = cycle(c, days, History.lastFullTs(c));
+        if (cy.startTs > 0 && cy.endTs <= 0) return false;
+        try (Db d = db(c); SQLiteDatabase w = d.getWritableDatabase()) {
             ContentValues cv = new ContentValues();
-            cv.put("start_ts", cy.startTs);
-            cv.put("end_ts", System.currentTimeMillis());
-            cv.put("manual", 1);
-            // start_ts 唯一 ⇒ 与自动封存、或重复点按天然去重
+            cv.put("start_ts", System.currentTimeMillis());
+            cv.put("end_ts", 0);                 // 开放行：还没收尾
+            // start_ts 唯一 ⇒ 连点两下只落一行
             return w.insertWithOnConflict("cycles", null, cv, SQLiteDatabase.CONFLICT_IGNORE) > 0;
         }
     }
@@ -197,22 +235,37 @@ public final class Samples {
         try (Cursor cur = w.rawQuery("SELECT MAX(end_ts) FROM cycles", null)) {
             if (cur.moveToFirst() && !cur.isNull(0)) lastEnd = cur.getLong(0);
         }
+        // 手动开始、还没收尾的那一轮：samples 里没有它的 100% 起点，起点只能从表里拿
+        long open = openStart(w);
         try (Cursor cur = w.rawQuery("SELECT ts, pct FROM samples ORDER BY ts ASC", null)) {
             while (cur.moveToNext()) {
                 long ts = cur.getLong(0);
                 int pct = cur.getInt(1);
-                if (pct >= FULL_PCT) { start = ts; }                       // 新的满电 ⇒ 开新一轮
-                else if (pct <= LOW_PCT) {
+                if (pct >= FULL_PCT) {                                     // 新的满电 ⇒ 开新一轮
+                    if (open > 0 && open < ts) {                           // 手动那轮到此刻收尾
+                        if (sealRow(w, open, ts, false)) added++;
+                        open = -1;
+                        lastEnd = ts;
+                    }
+                    start = ts;
+                } else if (pct <= LOW_PCT) {
+                    if (open > 0 && open < ts && start <= 0) {
+                        if (sealRow(w, open, ts, false)) {
+                            added++;
+                            lastEnd = ts;
+                            android.util.Log.i("Samples", "封存手动周期 " + open + " → " + ts);
+                        }
+                        open = -1;
+                        start = -1;
+                        continue;
+                    }
                     long s = start > 0 ? start : History.lastFullBefore(c, ts);
                     if (s <= 0) {
                         android.util.Log.i("Samples", "低电量 " + pct + "% 在 " + ts
                                 + " 找不到起点：序列与按天表里都没有更早的满电");
                     } else if (start > 0 || s > lastEnd) {
-                        ContentValues cv = new ContentValues();
-                        cv.put("start_ts", s);
-                        cv.put("end_ts", ts);
-                        // start_ts 唯一 ⇒ 同一个起点只会封一次；夹在中间的重复低电量读数不会插第二条
-                        if (w.insertWithOnConflict("cycles", null, cv, SQLiteDatabase.CONFLICT_IGNORE) > 0) {
+                        // 同一个起点只会封一次；夹在中间的重复低电量读数不会插第二条
+                        if (sealRow(w, s, ts, false)) {
                             added++;
                             lastEnd = ts;
                             // 留一行证据：装机后若明细里仍没有分组，先看这条日志有没有打出来
@@ -227,11 +280,47 @@ public final class Samples {
         return added;
     }
 
-    /** 已封存的周期，按序号升序 */
+    /**
+     * 封一轮：表里已有开放行（同一个起点）就更新它，否则插一行。
+     * 返回 true 表示这次真的封了一轮（重复调用不会重复计数）。
+     */
+    private static boolean sealRow(SQLiteDatabase w, long startTs, long endTs, boolean manual) {
+        ContentValues cv = new ContentValues();
+        cv.put("end_ts", endTs);
+        cv.put("manual", manual ? 1 : 0);
+        int n = w.update("cycles", cv, "start_ts = ? AND end_ts = 0",
+                new String[]{String.valueOf(startTs)});
+        if (n > 0) return true;
+        cv.put("start_ts", startTs);
+        return w.insertWithOnConflict("cycles", null, cv, SQLiteDatabase.CONFLICT_IGNORE) > 0;
+    }
+
+    /** 充满的那一刻：所有还没收尾的手动周期到此结束（新一轮从这次 100% 起算） */
+    private static void closeOpen(SQLiteDatabase w, long ts) {
+        ContentValues cv = new ContentValues();
+        cv.put("end_ts", ts);
+        w.update("cycles", cv, "end_ts = 0 AND start_ts < ?", new String[]{String.valueOf(ts)});
+    }
+
+    private static long openStart(SQLiteDatabase db) {
+        try (Cursor cur = db.rawQuery("SELECT MAX(start_ts) FROM cycles WHERE end_ts = 0", null)) {
+            if (cur.moveToFirst() && !cur.isNull(0)) return cur.getLong(0);
+        }
+        return -1;
+    }
+
+    private static long openStart(Context c) {
+        try (Db d = db(c); SQLiteDatabase r = d.getReadableDatabase()) {
+            return openStart(r);
+        }
+    }
+
+    /** 已封存的周期，按序号升序。end_ts = 0 的开放行（手动开始、还在计时）不算封存 */
     public static List<Sealed> sealed(Context c) {
         List<Sealed> out = new ArrayList<>();
         try (Db d = db(c); SQLiteDatabase r = d.getReadableDatabase();
-             Cursor cur = r.rawQuery("SELECT idx, start_ts, end_ts, manual FROM cycles ORDER BY idx ASC", null)) {
+             Cursor cur = r.rawQuery("SELECT idx, start_ts, end_ts, manual FROM cycles "
+                     + "WHERE end_ts > 0 ORDER BY idx ASC", null)) {
             while (cur.moveToNext()) {
                 out.add(new Sealed(cur.getInt(0), cur.getLong(1), cur.getLong(2), cur.getInt(3) != 0));
             }

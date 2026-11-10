@@ -386,7 +386,12 @@ public class HistoryFragment extends Fragment {
     private void renderRuntime() {
         if (cyStart <= 0) {
             runtime.setText(R.string.runtime_none);
-            Links.plain(runtimeHint, getString(R.string.runtime_hint_none));
+            if (State.shouldMask()) {
+                Links.plain(runtimeHint, getString(R.string.runtime_hint_none));
+            } else {
+                Links.bind(runtimeHint, getString(R.string.runtime_hint_none),
+                        getString(R.string.link_start_cycle), Links.INLINE, this::confirmStartCycle);
+            }
             return;
         }
         boolean done = cyEnd > 0;
@@ -395,9 +400,15 @@ public class HistoryFragment extends Fragment {
                 + " " + humanDuration(endMs - cyStart));
         String started = TS_FMT.format(ts(cyStart));
         if (done) {
-            Links.plain(runtimeHint, getString(cyManual ? R.string.runtime_hint_done_manual
-                                                        : R.string.runtime_hint_done,
-                    started, TS_FMT.format(ts(cyEnd))));
+            String hint = getString(cyManual ? R.string.runtime_hint_done_manual
+                                             : R.string.runtime_hint_done,
+                    started, TS_FMT.format(ts(cyEnd)));
+            if (State.shouldMask()) {
+                Links.plain(runtimeHint, hint);
+            } else {
+                Links.bind(runtimeHint, hint,
+                        getString(R.string.link_start_cycle), Links.INLINE, this::confirmStartCycle);
+            }
         } else if (State.shouldMask()) {
             // 遮罩下不挂可点词：设备不是验证型号时，"结束本轮"没有意义
             Links.plain(runtimeHint, getString(R.string.runtime_hint_running, started));
@@ -405,6 +416,22 @@ public class HistoryFragment extends Fragment {
             Links.bind(runtimeHint, getString(R.string.runtime_hint_running, started),
                     getString(R.string.link_end_cycle), Links.INLINE, this::confirmEndCycle);
         }
+    }
+
+    /** 上一轮结束后只充了一部分就想用：不等下一次 100%，从现在起另开一轮 */
+    private void confirmStartCycle() {
+        if ((cyStart > 0 && cyEnd <= 0) || State.shouldMask()) return;
+        android.content.Context c = getContext();
+        if (c == null) return;
+        new MaterialAlertDialogBuilder(c)
+                .setTitle(R.string.dlg_start_title)
+                .setMessage(R.string.dlg_start_body)
+                .setNegativeButton(R.string.dlg_cancel, null)
+                .setPositiveButton(R.string.dlg_start_ok, (d, w) -> {
+                    Samples.startNow(c, DAYS);
+                    refresh();
+                })
+                .show();
     }
 
     /** 电量没到 10% 但要去充电时，可以提前把本轮封存；下一次读到 100% 自然开新一轮 */

@@ -53,13 +53,14 @@
     <string name="overview_summary">最近 %1$d 天有记录 %2$d 天</string>
     <string name="overview_sampling_note">曲线只在应用打开时采样，断口即真实的无数据时段</string>
     <string name="runtime_none">尚无本轮数据</string>
-    <string name="runtime_hint_none">读到一次 100% 后开始计时</string>
+    <string name="runtime_hint_none">读到 100% 或手动开始后计时</string>
     <string name="runtime_done">本轮运行时长</string>
     <string name="runtime_running">本轮已运行</string>
     <string name="runtime_hint_done">%1$s → %2$s · 已进入低电量</string>
     <string name="runtime_hint_running">起点 %1$s · 尚未进入低电量</string>
     <string name="runtime_hint_done_manual">%1$s → %2$s · 手动结束</string>
     <string name="link_end_cycle">结束本轮</string>
+    <string name="link_start_cycle">开始新一轮</string>
 
     <string name="dlg_clear_title">清空全部记录？</string>
     <string name="dlg_clear_body">将删除所有历史电量记录，且不可恢复。</string>
@@ -67,6 +68,9 @@
     <string name="dlg_end_title">结束本轮？</string>
     <string name="dlg_end_body">本轮现在就结束，并保留在记录里；下一次读到 100% 时开始新的一轮。</string>
     <string name="dlg_end_ok">结束</string>
+    <string name="dlg_start_title">开始新一轮？</string>
+    <string name="dlg_start_body">从现在起计时，直到读到 ≤10%、读到 100% 或手动结束。</string>
+    <string name="dlg_start_ok">开始</string>
     <string name="dlg_cancel">取消</string>
 
     <string name="msg_copied">诊断信息已复制到剪贴板</string>

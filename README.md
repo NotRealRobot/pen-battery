@@ -89,7 +89,7 @@ floating navigation pill whose background is a real-time Gaussian blur of the co
 | | |
 |---|---|
 | 🔋 Live level | Subscribes to Battery Level (`0x2A19`) and updates on notification, with a 60-second poll as fallback. |
-| ⏱️ Charge-cycle duration | Elapsed time from the last 100 % reading to the first reading at or below 10 %, or until the cycle is ended manually. |
+| ⏱️ Charge-cycle duration | Elapsed time from the last 100 % reading (or from the moment you start a cycle manually) to the first reading at or below 10 %, or until the cycle is ended manually. |
 | 📈 History | One point per day as a trend line with dashed cycle boundaries, plus a per-day table. Completed charge cycles are folded into expandable "Cycle n" groups; a day that closes one cycle and opens the next appears in both. |
 | 📤 Export | CSV through the system file picker. |
 | 🧹 Clear | Removes all stored records. |
@@ -127,7 +127,8 @@ stored history.
   receiver and no persistent notification; gaps in the chart correspond to gaps in the data.
 - One recorded point per day.
 - A charge cycle completes after both endpoints (100 %, then ≤ 10 %) have been observed, or when
-  it is ended manually. The next 100 % reading starts a new cycle.
+  it is ended manually. The next 100 % reading starts a new cycle. You can also start a new cycle
+  manually after the previous one has closed — for example after a partial charge.
 - Battery values are reported by the device firmware (0–100) and are not reinterpreted.
 - Some vendor firmware reports an unreliable Bluetooth adapter state.
 

@@ -60,13 +60,14 @@
     <string name="overview_summary">%2$d of the last %1$d days have records</string>
     <string name="overview_sampling_note">The curve samples only while the app is open — a gap is a real no-data period</string>
     <string name="runtime_none">No round yet</string>
-    <string name="runtime_hint_none">Timing starts after a 100% reading</string>
+    <string name="runtime_hint_none">Timing starts at 100% or when you start it</string>
     <string name="runtime_done">Round duration</string>
     <string name="runtime_running">Running for</string>
     <string name="runtime_hint_done">%1$s → %2$s · reached low battery</string>
     <string name="runtime_hint_running">Started %1$s · low battery not reached</string>
     <string name="runtime_hint_done_manual">%1$s → %2$s · ended manually</string>
     <string name="link_end_cycle">End this cycle</string>
+    <string name="link_start_cycle">Start new cycle</string>
 
     <string name="dlg_clear_title">Delete all records?</string>
     <string name="dlg_clear_body">This removes every stored battery record and can\'t be undone.</string>
@@ -74,6 +75,9 @@
     <string name="dlg_end_title">End this cycle?</string>
     <string name="dlg_end_body">The cycle ends now and stays in History. The next 100% reading starts a new one.</string>
     <string name="dlg_end_ok">End</string>
+    <string name="dlg_start_title">Start a new cycle?</string>
+    <string name="dlg_start_body">Timing starts now and stops at a ≤10% reading, a 100% reading, or when you end it manually.</string>
+    <string name="dlg_start_ok">Start</string>
     <string name="dlg_cancel">Cancel</string>
 
     <string name="msg_copied">Diagnostics copied to clipboard</string>
